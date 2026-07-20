@@ -68,7 +68,7 @@ van-planner/
 ## UI-Komponenten
 
 ### Hauptansicht (Liste)
-- Kategorien als Tabs/Sections
+- Kategorien als vertikale Liste
 - Produkte pro Kategorie mit Checkbox
 - Tastatur-Shortcuts: `j/k` (Navigation), `Space` (Toggle), `n` (Neu), `e` (Edit), `d` (Delete), `q` (Quit)
 
@@ -82,30 +82,27 @@ van-planner/
 - Fortschrittsanzeige (erledigt/gesamt)
 - Menü-Hints
 
-## Implementierungs-Phasen
+## Implementierungsstatus
 
-### Phase 1: Grundgerüst
-1. `go mod init` und Bubble Tea installieren
-2. Datenmodelle definieren
-3. JSON-Storage (Lesen/Schreiben)
-4. Minimale TUI-Liste
+### ✅ Abgeschlossene Features
 
-### Phase 2: CRUD-Operationen
-1. Produkt erstellen (Formular)
-2. Produkt bearbeiten
-3. Produkt löschen
-4. JSON persistieren
+| Feature | Status | Beschreibung |
+|---------|--------|--------------|
+| Produktverwaltung (CRUD) | ✅ Implementiert | Create, Read, Update, Delete mit Formular |
+| Kategorien | ✅ Implementiert | 5 Standard-Kategorien mit Tabs und Filterung |
+| Fortschrittsanzeige | ✅ Implementiert | X/Y erledigt mit Checkbox-Toggle |
+| Suche | ✅ Implementiert | Volltextsuche über Name, Notizen, Kategorie |
+| JSON-Persistenz | ✅ Implementiert | Save-on-Change, Load-on-Start |
+| Tastaturbedienung | ✅ Implementiert | Vollständige Keyboard-Navigation |
 
-### Phase 3: UX-Verbesserungen
-1. Checkbox-Toggle
-2. Kategorie-Filter/Navigation
-3. Suche
-4. Validierung
+### 🔲 Geplante Features
 
-### Phase 4: Erweiterte Features
-1. Benutzerdefinierte Felder
-2. Export/Import
-3. Vorschau/Statistiken
+| Feature | Status | Beschreibung |
+|---------|--------|--------------|
+| Kategorien bearbeiten | 🔲 Geplant | Kategorien erstellen, bearbeiten, löschen |
+| Benutzerdefinierte Felder | 🔲 Geplant | Erweitern des Datenmodells um Custom Fields |
+| Export/Import | 🔲 Geplant | CSV/JSON Export und Import |
+| Vorschau/Statistiken | 🔲 Geplant | Übersicht über Budget und Fortschritt |
 
 ## Abhängigkeiten
 
@@ -117,6 +114,6 @@ go get github.com/charmbracelet/lipgloss
 
 ## Nächste Schritte
 
-1. User-Feedback zu diesem Plan
-2. Phase 1 implementieren
-3. Inkrementell erweitern
+1. Feature 3: Kategorien bearbeiten implementieren
+2. Feature 4: Fortschrittsanzeige (bereits implementiert)
+3. Feature 5-7: Weitere Features

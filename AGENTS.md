@@ -26,3 +26,59 @@
 - Verwende parallele Tool-Calls wo möglich.
 - Runne Lint/Typecheck-Befehle nach Code-Änderungen, falls verfügbar.
 - Vermeide head/tail/grep - verwende die dedizierten Tools stattdessen.
+
+## Feature-Driven Development
+
+### Feature-Dateien (`features/`)
+Features werden in nummerierten Markdown-Dateien im `features/` Ordner spezifiziert.
+
+#### Struktur einer Feature-Datei
+```markdown
+# Feature: [Feature-Name]
+
+## Status
+🔲 Geplant / ⬇️ In Arbeit / ✅ Implementiert
+
+## Beschreibung
+Kurze Beschreibung des Features.
+
+## Funktionalität
+Detaillierte Beschreibung der Features und Funktionen.
+
+## Dateien
+- `pfad/zur/datei.go` – Beschreibung
+
+## Tastatur-Shortcuts
+| Taste | Aktion |
+|-------|--------|
+| `x` | Aktion |
+
+## Datenmodell
+```json
+{...}
+```
+```
+
+### Workflow
+
+#### Neues Feature implementieren
+1. Neue Feature-Datei mit nächster Nummer erstellen (z.B. `07-neues-feature.md`)
+2. Feature nach Vorlage (`00-vorlage.md`) spezifizieren
+3. Datei committen
+4. Implementierung basierend auf Feature-Datei durchführen
+
+#### Feature anpassen
+1. Existierende Feature-Datei editieren
+2. Änderungen committen
+3. Code-Anpassungen basierend auf aktualisierter Datei vornehmen
+
+#### Regeln
+- Feature-Dateien sind die **Single Source of Truth** für Anforderungen
+- Vor Implementierung: Feature-Datei lesen und verstehen
+- Nach Implementierung: Feature-Datei auf `✅ Implementiert` setzen
+- Bei Unklarheiten in Feature-Datei: Nachfragen statt raten
+
+### Branch-Strategie
+- Feature-Branches: `feature/<name>` (z.B. `feature/phase1-grundgeruest`)
+- Pro Feature-Datei kann ein eigener Branch erstellt werden
+- Nach Abschluss: Merge in Hauptbranch
