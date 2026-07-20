@@ -1,0 +1,6 @@
+van-planner
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
