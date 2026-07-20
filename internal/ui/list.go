@@ -40,6 +40,7 @@ type listModel struct {
 	filteredData  model.Data
 	searchInput   textinput.Model
 	showSearch    bool
+	categoryWidth int
 }
 
 func newListModel(data model.Data) listModel {
@@ -156,26 +157,28 @@ func (m listModel) Update(msg tea.Msg) (listModel, tea.Cmd) {
 			}
 			return m, nil
 		case "j", "down":
-			m.list.CursorDown()
+			if m.list.Index() >= len(m.filteredData.Products)-1 {
+				m.categoryIndex++
+				if m.categoryIndex >= len(m.data.Categories) {
+					m.categoryIndex = 0
+				}
+				m.filteredData = filterByCategory(m.data, m.data.Categories[m.categoryIndex])
+				m.list.SetItems(createListItems(m.filteredData))
+			} else {
+				m.list.CursorDown()
+			}
 			return m, nil
 		case "k", "up":
-			m.list.CursorUp()
-			return m, nil
-		case "right":
-			m.categoryIndex++
-			if m.categoryIndex >= len(m.data.Categories) {
-				m.categoryIndex = 0
+			if m.list.Index() == 0 {
+				m.categoryIndex--
+				if m.categoryIndex < 0 {
+					m.categoryIndex = len(m.data.Categories) - 1
+				}
+				m.filteredData = filterByCategory(m.data, m.data.Categories[m.categoryIndex])
+				m.list.SetItems(createListItems(m.filteredData))
+			} else {
+				m.list.CursorUp()
 			}
-			m.filteredData = filterByCategory(m.data, m.data.Categories[m.categoryIndex])
-			m.list.SetItems(createListItems(m.filteredData))
-			return m, nil
-		case "left":
-			m.categoryIndex--
-			if m.categoryIndex < 0 {
-				m.categoryIndex = len(m.data.Categories) - 1
-			}
-			m.filteredData = filterByCategory(m.data, m.data.Categories[m.categoryIndex])
-			m.list.SetItems(createListItems(m.filteredData))
 			return m, nil
 		case "/":
 			m.showSearch = true
@@ -203,7 +206,7 @@ func (m listModel) View() string {
 	b.WriteString(TitleStyle.Render("Van Planner TUI") + "\n")
 	b.WriteString(SubtitleStyle.Render("Planer für deinen Campervan-Ausbau") + "\n\n")
 
-	b.WriteString(m.categoryTabs())
+	b.WriteString(m.categoryList())
 	b.WriteString("\n")
 
 	if m.showSearch {
@@ -221,8 +224,8 @@ func (m listModel) View() string {
 	return b.String() + m.list.View()
 }
 
-func (m listModel) categoryTabs() string {
-	var tabs []string
+func (m listModel) categoryList() string {
+	var categories []string
 	for i, cat := range m.data.Categories {
 		count := 0
 		for _, p := range m.data.Products {
@@ -232,12 +235,12 @@ func (m listModel) categoryTabs() string {
 		}
 
 		if i == m.categoryIndex {
-			tabs = append(tabs, CategoryStyle.Render(fmt.Sprintf(" [%d] %s (%d) ", i+1, cat, count)))
+			categories = append(categories, CategoryStyle.Render(fmt.Sprintf("▶ [%d] %s (%d)", i+1, cat, count)))
 		} else {
-			tabs = append(tabs, fmt.Sprintf(" [%d] %s (%d) ", i+1, cat, count))
+			categories = append(categories, fmt.Sprintf("  [%d] %s (%d)", i+1, cat, count))
 		}
 	}
-	return strings.Join(tabs, " ")
+	return strings.Join(categories, "\n")
 }
 
 func (m listModel) SetSize(width, height int) {

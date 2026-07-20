@@ -16,12 +16,13 @@ Organisation von Produkten in Kategorien für bessere Strukturierung.
 5. Stauraum
 
 ### Kategorie-Anzeige
-- Tabs mit Produktanzahl pro Kategorie
+- Kategorien als vertikale Liste links
+- Produktanzahl pro Kategorie angezeigt
 - Aktive Kategorie hervorgehoben
 - Kategorie-Index (1-5) angezeigt
 
 ### Navigation
-- Wechsel mit Pfeiltasten (←/→)
+- Wechsel mit Pfeiltasten (↑/↓)
 - Direkte Auswahl mit Tasten 1-5
 - Filterung der Produktliste
 
@@ -37,7 +38,7 @@ Organisation von Produkten in Kategorien für bessere Strukturierung.
 ## Tastatur-Shortcuts
 | Taste | Aktion |
 |-------|--------|
-| `←` / `→` | Vorherige/Nächste Kategorie |
+| `↑` / `↓` (im leeren Bereich) | Vorherige/Nächste Kategorie |
 | `1` - `5` | Direkte Kategorie-Auswahl |
 
 ## Erweiterbarkeit

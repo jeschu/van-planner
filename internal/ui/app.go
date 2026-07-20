@@ -176,7 +176,7 @@ func (a *App) statusBar() string {
 		fmt.Sprintf(" %d/%d erledigt ", completed, len(a.data.Products)),
 	)
 
-	help := HelpStyle.Render("j/k: Navigation | ←/→: Kategorie | Space: Toggle | n: Neu | e: Edit | d: Delete | /: Suche | q: Quit")
+	help := HelpStyle.Render("j/k: Navigation | ↑/↓: Kategorie | Space: Toggle | n: Neu | e: Edit | d: Delete | /: Suche | q: Quit")
 
 	if a.message != "" {
 		return status + "\n\n" + a.message + "\n\n" + help
