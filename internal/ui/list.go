@@ -175,8 +175,7 @@ func (m listModel) Update(msg tea.Msg) (listModel, tea.Cmd) {
 func (m listModel) View() string {
 	var b strings.Builder
 
-	b.WriteString(TitleStyle.Render("Van Planner") + "\n")
-	b.WriteString(SubtitleStyle.Render("Planer für deinen Campervan-Ausbau") + "\n")
+	b.WriteString(TitleStyle.Render("Van Planner") + SubtitleStyle.Render(" – Planer für deinen Campervan-Ausbau") + "\n")
 	b.WriteString(ProjectStyle.Render("Projekt: "+m.projectName) + "\n\n")
 
 	if m.showSearch {
