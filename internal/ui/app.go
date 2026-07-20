@@ -39,20 +39,33 @@ type App struct {
 }
 
 func NewApp(s *storage.JSONStorage) (*App, error) {
-	data, err := s.Load()
+	pm := storage.NewProjectManager()
+
+	appConfig, err := pm.LoadAppConfig()
 	if err != nil {
-		return nil, err
+		appConfig = storage.AppConfig{}
 	}
 
-	pm := storage.NewProjectManager()
+	projectName := "default"
+	if appConfig.LastProject != "" && pm.ProjectExists(appConfig.LastProject) {
+		projectName = appConfig.LastProject
+	}
+
+	data, err := pm.LoadProject(projectName)
+	if err != nil {
+		data, err = s.Load()
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	app := &App{
 		data:           data,
-		storage:        s,
+		storage:        storage.NewJSONStorage(fmt.Sprintf("%s/%s.json", storage.ProjectsDir, projectName)),
 		projectManager: pm,
-		list:           newListModel(data, "default"),
+		list:           newListModel(data, projectName),
 		mode:           modeList,
-		currentProject: "default",
+		currentProject: projectName,
 	}
 
 	return app, nil
@@ -411,6 +424,11 @@ func (a *App) loadProject(name string) {
 				break
 			}
 		}
+	}
+
+	appConfig := storage.AppConfig{LastProject: name}
+	if err := a.projectManager.SaveAppConfig(appConfig); err != nil {
+		a.message = "Fehler beim Speichern der Config: " + err.Error()
 	}
 }
 

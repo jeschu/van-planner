@@ -9,11 +9,18 @@ import (
 	"github.com/jens/van-planner/internal/model"
 )
 
-const ProjectsDir = "projekte"
+const (
+	ProjectsDir   = "projekte"
+	AppConfigFile = "van-planner.config.json"
+)
 
 type ProjectInfo struct {
 	Name     string `json:"name"`
 	FilePath string `json:"-"`
+}
+
+type AppConfig struct {
+	LastProject string `json:"lastProject,omitempty"`
 }
 
 type ProjectManager struct {
@@ -124,4 +131,31 @@ func (pm *ProjectManager) SaveProjectConfig(name string, config model.ProjectCon
 	data.LastProductID = config.LastProductID
 
 	return pm.SaveProject(name, data)
+}
+
+func (pm *ProjectManager) LoadAppConfig() (AppConfig, error) {
+	filePath := AppConfigFile
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return AppConfig{}, nil
+		}
+		return AppConfig{}, err
+	}
+
+	var config AppConfig
+	if err := json.Unmarshal(data, &config); err != nil {
+		return AppConfig{}, err
+	}
+
+	return config, nil
+}
+
+func (pm *ProjectManager) SaveAppConfig(config AppConfig) error {
+	data, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(AppConfigFile, data, 0644)
 }

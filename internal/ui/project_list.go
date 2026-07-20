@@ -2,11 +2,13 @@ package ui
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/jens/van-planner/internal/storage"
 )
 
@@ -14,16 +16,29 @@ type projectItem struct {
 	info storage.ProjectInfo
 }
 
-func (i projectItem) Title() string {
-	return i.info.Name
-}
+func (i projectItem) Title() string       { return i.info.Name }
+func (i projectItem) Description() string { return "" }
+func (i projectItem) FilterValue() string { return i.info.Name }
 
-func (i projectItem) Description() string {
-	return i.info.FilePath
-}
+type projectItemDelegate struct{}
 
-func (i projectItem) FilterValue() string {
-	return i.info.Name
+func (d projectItemDelegate) Height() int                               { return 1 }
+func (d projectItemDelegate) Spacing() int                              { return 0 }
+func (d projectItemDelegate) Update(msg tea.Msg, m *list.Model) tea.Cmd { return nil }
+func (d projectItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	item, ok := listItem.(projectItem)
+	if !ok {
+		return
+	}
+
+	var style lipgloss.Style
+	if index == m.Index() {
+		style = SelectedItemStyle
+	} else {
+		style = ItemStyle
+	}
+
+	fmt.Fprint(w, style.Render("◼ "+item.info.Name))
 }
 
 type ProjectListMode int
@@ -53,9 +68,9 @@ func newProjectListModel(pm *storage.ProjectManager) projectListModel {
 		items[i] = projectItem{info: p}
 	}
 
-	l := list.New(items, list.NewDefaultDelegate(), 0, 0)
+	l := list.New(items, projectItemDelegate{}, 0, 0)
 	l.Title = "Projekt auswählen"
-	l.SetShowStatusBar(true)
+	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(true)
 
 	nameInput := textinput.New()
