@@ -31,6 +31,7 @@ Laden und Speichern von verschiedenen Projekten als separate JSON-Dateien.
 - `internal/ui/project_list.go` – Projektauswahl UI
 - `internal/ui/app.go` – Projekt-Wechsel Logik (loadProject)
 - `projekte/*.json` – Projekt-Dateien
+- `projekte/*.config.json` – Projekt-Config-Dateien
 
 ## Tastatur-Shortcuts
 | Taste | Aktion |

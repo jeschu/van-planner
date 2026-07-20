@@ -15,7 +15,7 @@ Vollständige Verwaltung von Produkten mit Create, Read, Update und Delete Opera
 - Aktuelle Kategorie wird übernommen
 
 ### Read
-- Produkte in Liste anzeigen
+- Produkte in gruppierten Liste anzeigen (nach Kategorien)
 - Details im Formular bearbeitbar
 
 ### Update

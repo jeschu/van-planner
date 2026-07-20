@@ -24,8 +24,8 @@ Jedes Projekt erhält eine `config.json` Datei, die Projekteinstellungen speiche
 
 ## Dateien
 - `internal/storage/project.go` – Config-Les/Schreib-Logik erweitern
-- `internal/model/config.go` – Neues Config-Modell
-- `internal/ui/app.go` – Auto-Load-Logik beim Projektstart
+- `internal/model/product.go` – ProjectConfig-Modell
+- `internal/ui/app.go` – Auto-Load-Logik beim Projektstart (loadProject, saveLastProduct)
 
 ## Tastatur-Shortcuts
 | Taste | Aktion |
