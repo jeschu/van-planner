@@ -90,6 +90,7 @@ van-planner/
 |---------|--------|--------------|
 | Produktverwaltung (CRUD) | ✅ Implementiert | Create, Read, Update, Delete mit Formular |
 | Kategorien | ✅ Implementiert | 5 Standard-Kategorien mit Tabs und Filterung |
+| Kategorien bearbeiten | ✅ Implementiert | Kategorien erstellen, bearbeiten, löschen |
 | Fortschrittsanzeige | ✅ Implementiert | X/Y erledigt mit Checkbox-Toggle |
 | Suche | ✅ Implementiert | Volltextsuche über Name, Notizen, Kategorie |
 | JSON-Persistenz | ✅ Implementiert | Save-on-Change, Load-on-Start |
@@ -99,7 +100,6 @@ van-planner/
 
 | Feature | Status | Beschreibung |
 |---------|--------|--------------|
-| Kategorien bearbeiten | 🔲 Geplant | Kategorien erstellen, bearbeiten, löschen |
 | Benutzerdefinierte Felder | 🔲 Geplant | Erweitern des Datenmodells um Custom Fields |
 | Export/Import | 🔲 Geplant | CSV/JSON Export und Import |
 | Vorschau/Statistiken | 🔲 Geplant | Übersicht über Budget und Fortschritt |
@@ -114,6 +114,6 @@ go get github.com/charmbracelet/lipgloss
 
 ## Nächste Schritte
 
-1. Feature 3: Kategorien bearbeiten implementieren
-2. Feature 4: Fortschrittsanzeige (bereits implementiert)
-3. Feature 5-7: Weitere Features
+1. Feature: Benutzerdefinierte Felder – Feature-Datei erstellen und implementieren
+2. Feature: Export/Import – Feature-Datei erstellen und implementieren
+3. Feature: Vorschau/Statistiken – Feature-Datei erstellen und implementieren

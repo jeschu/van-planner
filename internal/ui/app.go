@@ -16,16 +16,20 @@ const (
 	modeCreate
 	modeEdit
 	modeDelete
+	modeCreateCategory
+	modeEditCategory
+	modeDeleteCategory
 )
 
 type App struct {
-	data     model.Data
-	storage  *storage.JSONStorage
-	list     listModel
-	form     formModel
-	mode     mode
-	quitting bool
-	message  string
+	data         model.Data
+	storage      *storage.JSONStorage
+	list         listModel
+	form         formModel
+	categoryForm categoryFormModel
+	mode         mode
+	quitting     bool
+	message      string
 }
 
 func NewApp(storage *storage.JSONStorage) (*App, error) {
@@ -85,10 +89,56 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return a, nil
 				}
 			}
+		case "K":
+			if a.mode == modeList {
+				a.categoryForm = newCategoryFormModel("create", "")
+				a.mode = modeCreateCategory
+				return a, textinput.Blink
+			}
+		case "E":
+			if a.mode == modeList {
+				currentCat := a.list.GetCurrentCategory()
+				a.categoryForm = newCategoryFormModel("edit", currentCat)
+				a.mode = modeEditCategory
+				return a, textinput.Blink
+			}
+		case "D":
+			if a.mode == modeList {
+				currentCat := a.list.GetCurrentCategory()
+				hasProducts := false
+				for _, p := range a.data.Products {
+					if p.Category == currentCat {
+						hasProducts = true
+						break
+					}
+				}
+				if hasProducts {
+					a.message = "Kategorie enthält Produkte. Erst Produkte löschen oder verschieben."
+				} else {
+					a.deleteCategory(currentCat)
+					a.message = "Kategorie gelöscht"
+				}
+				return a, nil
+			}
 		}
 
 	case tea.WindowSizeMsg:
 		a.list.SetSize(msg.Width, msg.Height)
+	}
+
+	if a.mode == modeCreateCategory || a.mode == modeEditCategory {
+		var cmd tea.Cmd
+		a.categoryForm, cmd = a.categoryForm.Update(msg)
+		if a.categoryForm.submitting {
+			if a.mode == modeCreateCategory {
+				a.createCategory()
+			} else if a.mode == modeEditCategory {
+				a.editCategory()
+			}
+			a.mode = modeList
+			return a, nil
+		}
+		return a, cmd
 	}
 
 	var cmd tea.Cmd
@@ -145,8 +195,6 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return a, cmd
 	}
-
-	return a, cmd
 }
 
 func (a *App) View() string {
@@ -159,6 +207,10 @@ func (a *App) View() string {
 		return TitleStyle.Render("Neues Produkt") + "\n\n" + a.form.View()
 	case modeEdit:
 		return TitleStyle.Render("Produkt bearbeiten") + "\n\n" + a.form.View()
+	case modeCreateCategory:
+		return TitleStyle.Render("Neue Kategorie") + "\n\n" + a.categoryForm.View()
+	case modeEditCategory:
+		return TitleStyle.Render("Kategorie bearbeiten") + "\n\n" + a.categoryForm.View()
 	default:
 		return a.list.View() + a.statusBar()
 	}
@@ -176,11 +228,87 @@ func (a *App) statusBar() string {
 		fmt.Sprintf(" %d/%d erledigt ", completed, len(a.data.Products)),
 	)
 
-	help := HelpStyle.Render("j/k: Navigation | ↑/↓: Kategorie | Space: Toggle | n: Neu | e: Edit | d: Delete | /: Suche | q: Quit")
+	help := HelpStyle.Render("j/k: Navigation | ↑/↓: Kategorie | Space: Toggle | n: Neu | e: Edit | d: Delete | K: Kat.Neu | E: Kat.Edit | D: Kat.Delete | /: Suche | q: Quit")
 
 	if a.message != "" {
 		return status + "\n\n" + a.message + "\n\n" + help
 	}
 
 	return status + "\n" + help
+}
+
+func (a *App) createCategory() {
+	name := a.categoryForm.GetCategoryName()
+	if name == "" {
+		a.message = "Fehler: Kategorienname ist erforderlich"
+		return
+	}
+
+	for _, cat := range a.data.Categories {
+		if cat == name {
+			a.message = "Fehler: Kategorie existiert bereits"
+			return
+		}
+	}
+
+	a.data.Categories = append(a.data.Categories, name)
+	a.list = newListModel(a.data)
+	a.message = "Kategorie erstellt"
+	if err := a.storage.Save(a.data); err != nil {
+		a.message = "Fehler beim Speichern: " + err.Error()
+	}
+}
+
+func (a *App) editCategory() {
+	newName := a.categoryForm.GetCategoryName()
+	if newName == "" {
+		a.message = "Fehler: Kategorienname ist erforderlich"
+		return
+	}
+
+	oldName := a.list.GetCurrentCategory()
+	if oldName == newName {
+		a.message = "Keine Änderung"
+		return
+	}
+
+	for _, cat := range a.data.Categories {
+		if cat == newName {
+			a.message = "Fehler: Kategorie existiert bereits"
+			return
+		}
+	}
+
+	for i, cat := range a.data.Categories {
+		if cat == oldName {
+			a.data.Categories[i] = newName
+			break
+		}
+	}
+
+	for i := range a.data.Products {
+		if a.data.Products[i].Category == oldName {
+			a.data.Products[i].Category = newName
+		}
+	}
+
+	a.list = newListModel(a.data)
+	a.message = "Kategorie aktualisiert"
+	if err := a.storage.Save(a.data); err != nil {
+		a.message = "Fehler beim Speichern: " + err.Error()
+	}
+}
+
+func (a *App) deleteCategory(name string) {
+	for i, cat := range a.data.Categories {
+		if cat == name {
+			a.data.Categories = append(a.data.Categories[:i], a.data.Categories[i+1:]...)
+			break
+		}
+	}
+
+	a.list = newListModel(a.data)
+	if err := a.storage.Save(a.data); err != nil {
+		a.message = "Fehler beim Speichern: " + err.Error()
+	}
 }

@@ -1,7 +1,7 @@
 # Feature: Kategorien bearbeiten
 
 ## Status
-🔲 Geplant
+✅ Implementiert
 
 ## Beschreibung
 Erstellen, Bearbeiten und Löschen von benutzerdefinierten Kategorien.
@@ -28,7 +28,7 @@ Erstellen, Bearbeiten und Löschen von benutzerdefinierten Kategorien.
 
 ## Dateien
 - `internal/ui/category_form.go` – Kategorie-Formular
-- `internal/ui/app.go` – Kategorie-CRUD-Logik
+- `internal/ui/app.go` – Kategorie-CRUD-Logik (createCategory, editCategory, deleteCategory)
 - `data/products.json` – Kategorien gespeichert
 
 ## Tastatur-Shortcuts
