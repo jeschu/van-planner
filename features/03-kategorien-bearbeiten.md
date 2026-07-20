@@ -23,7 +23,7 @@ Erstellen, Bearbeiten und Löschen von benutzerdefinierten Kategorien.
 - Option: Produkte in andere Kategorie verschieben
 
 ### Standard-Kategorien
-- Vordefinierte Kategorien: Elektrik, Wasser, Küche, Schlafen, Stauraum
+- Vordefinierte Kategorien: Fahrzeug, Elektrik, Wasser, Küche, Schlafen, Stauraum
 - Benutzerdefinierte Kategorien ergänzend
 
 ## Dateien
@@ -41,6 +41,6 @@ Erstellen, Bearbeiten und Löschen von benutzerdefinierten Kategorien.
 ## Datenmodell
 ```json
 {
-  "categories": ["Elektrik", "Wasser", "Küche", "Schlafen", "Stauraum", "Eigene Kategorie"]
+  "categories": ["Fahrzeug", "Elektrik", "Wasser", "Küche", "Schlafen", "Stauraum", "Eigene Kategorie"]
 }
 ```

@@ -9,11 +9,12 @@ Organisation von Produkten in Kategorien für bessere Strukturierung.
 ## Funktionalität
 
 ### Standard-Kategorien
-1. Elektrik
-2. Wasser
-3. Küche
-4. Schlafen
-5. Stauraum
+1. Fahrzeug
+2. Elektrik
+3. Wasser
+4. Küche
+5. Schlafen
+6. Stauraum
 
 ### Kategorie-Anzeige
 - Kategorien als vertikale Liste links
@@ -23,7 +24,7 @@ Organisation von Produkten in Kategorien für bessere Strukturierung.
 
 ### Navigation
 - Wechsel mit Pfeiltasten (↑/↓)
-- Direkte Auswahl mit Tasten 1-5
+- Direkte Auswahl mit Tasten 1-6
 - Filterung der Produktliste
 
 ### Kategorie bei Create
@@ -39,7 +40,7 @@ Organisation von Produkten in Kategorien für bessere Strukturierung.
 | Taste | Aktion |
 |-------|--------|
 | `↑` / `↓` (im leeren Bereich) | Vorherige/Nächste Kategorie |
-| `1` - `5` | Direkte Kategorie-Auswahl |
+| `1` - `6` | Direkte Kategorie-Auswahl |
 
 ## Erweiterbarkeit
 Kategorien können in `projekte/*.json` angepasst werden:

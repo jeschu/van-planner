@@ -35,7 +35,7 @@ Eine TUI-Anwendung in Go zur Planung von Campervan-Ausbauprodukten mit JSON-Date
 
 ```json
 {
-  "categories": ["Elektrik", "Wasser", "Küche", "Schlafen", "Stauraum"],
+  "categories": ["Fahrzeug", "Elektrik", "Wasser", "Küche", "Schlafen", "Stauraum"],
   "products": [...]
 }
 ```
@@ -89,7 +89,7 @@ van-planner/
 | Feature | Status | Beschreibung |
 |---------|--------|--------------|
 | Produktverwaltung (CRUD) | ✅ Implementiert | Create, Read, Update, Delete mit Formular |
-| Kategorien | ✅ Implementiert | 5 Standard-Kategorien mit Tabs und Filterung |
+| Kategorien | ✅ Implementiert | 6 Standard-Kategorien mit Tabs und Filterung |
 | Kategorien bearbeiten | ✅ Implementiert | Kategorien erstellen, bearbeiten, löschen |
 | Fortschrittsanzeige | ✅ Implementiert | X/Y erledigt mit Checkbox-Toggle |
 | Suche | ✅ Implementiert | Volltextsuche über Name, Notizen, Kategorie |

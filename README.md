@@ -5,7 +5,7 @@ Eine Terminal-basierte Anwendung in Go zur Planung von Campervan-Ausbau-Produkte
 ## Features
 
 - **Produktverwaltung** – Erstellen, Bearbeiten, Löschen von Produkten
-- **Kategorien** – Organisation nach Bereichen (Elektrik, Wasser, Küche, etc.)
+- **Kategorien** – Organisation nach Bereichen (Fahrzeug, Elektrik, Wasser, Küche, etc.)
 - **Fortschrittsanzeige** – Behalte den Überblick über erledigte Produkte
 - **Suche** – Schnelles Finden von Produkten
 - **JSON-Persistenz** – Alle Daten werden lokal gespeichert
@@ -40,7 +40,7 @@ Die Daten werden standardmäßig in `projekte/default.json` gespeichert.
 | `j` / `↓` | Nach unten navigieren |
 | `k` / `↑` | Nach oben navigieren |
 | `←` / `→` | Kategorie wechseln |
-| `1` - `5` | Direkte Kategorie-Auswahl |
+| `1` - `6` | Direkte Kategorie-Auswahl |
 | `Space` | Produkt als erledigt markieren |
 | `n` | Neues Produkt erstellen |
 | `e` | Produkt bearbeiten |
@@ -86,11 +86,12 @@ Beim Erstellen oder Bearbeiten eines Produkts können folgende Attribute angegeb
 
 Standardmäßig sind folgende Kategorien verfügbar:
 
-1. Elektrik
-2. Wasser
-3. Küche
-4. Schlafen
-5. Stauraum
+1. Fahrzeug
+2. Elektrik
+3. Wasser
+4. Küche
+5. Schlafen
+6. Stauraum
 
 ## Datenformat
 
@@ -98,7 +99,7 @@ Die Daten werden im `projekte/` Verzeichnis im JSON-Format gespeichert:
 
 ```json
 {
-  "categories": ["Elektrik", "Wasser", "Küche", "Schlafen", "Stauraum"],
+  "categories": ["Fahrzeug", "Elektrik", "Wasser", "Küche", "Schlafen", "Stauraum"],
   "products": [
     {
       "id": "uuid",
@@ -120,7 +121,7 @@ Die Daten werden im `projekte/` Verzeichnis im JSON-Format gespeichert:
 Navigation:
   j/k       - Runter/Hoch
   ←/→       - Kategorie wechseln
-  1-5       - Direkte Kategorie-Auswahl
+  1-6       - Direkte Kategorie-Auswahl
 
 Aktionen:
   Space     - Toggle erledigt

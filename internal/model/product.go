@@ -33,7 +33,7 @@ type Data struct {
 
 func NewData() Data {
 	return Data{
-		Categories: []string{"Elektrik", "Wasser", "Küche", "Schlafen", "Stauraum"},
+		Categories: []string{"Fahrzeug", "Elektrik", "Wasser", "Küche", "Schlafen", "Stauraum"},
 		Products:   []Product{},
 	}
 }
