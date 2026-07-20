@@ -29,7 +29,7 @@ Erstellen, Bearbeiten und Löschen von benutzerdefinierten Kategorien.
 ## Dateien
 - `internal/ui/category_form.go` – Kategorie-Formular
 - `internal/ui/app.go` – Kategorie-CRUD-Logik (createCategory, editCategory, deleteCategory)
-- `data/products.json` – Kategorien gespeichert
+- `projekte/*.json` – Kategorien gespeichert
 
 ## Tastatur-Shortcuts
 | Taste | Aktion |

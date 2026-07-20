@@ -9,7 +9,7 @@ Lokale Speicherung aller Daten im JSON-Format.
 ## Funktionalität
 
 ### Speicherort
-- Standard: `data/products.json`
+- Standard: `projekte/default.json`
 - Automatische Verzeichnis-Erstellung
 
 ### Save-On-Change
@@ -41,7 +41,7 @@ Lokale Speicherung aller Daten im JSON-Format.
 
 ## Dateien
 - `internal/storage/json.go` – Storage-Implementierung
-- `data/products.json` – Datenspeicher
+- `projekte/*.json` – Datenspeicher
 
 ## Schnittstelle
 ```go

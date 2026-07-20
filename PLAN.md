@@ -59,8 +59,8 @@ van-planner/
 │       ├── list.go
 │       ├── form.go
 │       └── styles.go
-├── data/
-│   └── products.json
+├── projekte/
+│   └── default.json
 ├── go.mod
 └── go.sum
 ```

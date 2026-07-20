@@ -33,7 +33,7 @@ Organisation von Produkten in Kategorien für bessere Strukturierung.
 ## Dateien
 - `internal/ui/list.go` – Kategorie-Tabs und Filterung
 - `internal/model/product.go` – Kategorie im Produktmodell
-- `data/products.json` – Kategorien definierbar
+- `projekte/*.json` – Kategorien definierbar
 
 ## Tastatur-Shortcuts
 | Taste | Aktion |
@@ -42,7 +42,7 @@ Organisation von Produkten in Kategorien für bessere Strukturierung.
 | `1` - `5` | Direkte Kategorie-Auswahl |
 
 ## Erweiterbarkeit
-Kategorien können in `data/products.json` angepasst werden:
+Kategorien können in `projekte/*.json` angepasst werden:
 ```json
 {
   "categories": ["Neue Kategorie", "Weitere Kategorie"]

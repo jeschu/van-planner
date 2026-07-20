@@ -29,7 +29,7 @@ go build -o van-planner ./cmd/van-planner
 ./van-planner
 ```
 
-Die Daten werden standardmäßig in `data/products.json` gespeichert.
+Die Daten werden standardmäßig in `projekte/default.json` gespeichert.
 
 ## Bedienung
 
@@ -89,7 +89,7 @@ Standardmäßig sind folgende Kategorien verfügbar:
 
 ## Datenformat
 
-Die Daten werden im JSON-Format gespeichert:
+Die Daten werden im `projekte/` Verzeichnis im JSON-Format gespeichert:
 
 ```json
 {
