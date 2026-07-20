@@ -242,6 +242,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if err := a.storage.Save(a.data); err != nil {
 			a.message = "Fehler beim Speichern: " + err.Error()
 		}
+		a.saveLastProduct()
 		return a, cmd
 	}
 }
@@ -371,9 +372,43 @@ func (a *App) loadProject(name string) {
 		return
 	}
 
+	config, err := a.projectManager.LoadProjectConfig(name)
+	if err != nil {
+		a.message = "Fehler beim Laden der Config: " + err.Error()
+		return
+	}
+
 	a.data = data
 	a.currentProject = name
 	a.list = newListModel(data)
 	a.storage = storage.NewJSONStorage(fmt.Sprintf("%s/%s.json", storage.ProjectsDir, name))
 	a.message = "Projekt geladen: " + name
+
+	if config.LastProductID != "" {
+		for i, product := range a.data.Products {
+			if product.ID == config.LastProductID {
+				a.list.list.Select(i)
+				break
+			}
+		}
+	}
+}
+
+func (a *App) saveLastProduct() {
+	if len(a.data.Products) == 0 {
+		return
+	}
+
+	idx := a.list.list.Index()
+	if idx >= len(a.data.Products) {
+		return
+	}
+
+	config := model.ProjectConfig{
+		LastProductID: a.data.Products[idx].ID,
+	}
+
+	if err := a.projectManager.SaveProjectConfig(a.currentProject, config); err != nil {
+		a.message = "Fehler beim Speichern der Config: " + err.Error()
+	}
 }

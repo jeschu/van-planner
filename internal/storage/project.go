@@ -20,6 +20,10 @@ type ProjectManager struct {
 	baseDir string
 }
 
+func (pm *ProjectManager) getConfigPath(projectName string) string {
+	return filepath.Join(pm.baseDir, projectName+".config.json")
+}
+
 func NewProjectManager() *ProjectManager {
 	return &ProjectManager{
 		baseDir: ProjectsDir,
@@ -87,7 +91,18 @@ func (pm *ProjectManager) CreateProject(name string) error {
 		return err
 	}
 
-	return os.WriteFile(filePath, dataJSON, 0644)
+	if err := os.WriteFile(filePath, dataJSON, 0644); err != nil {
+		return err
+	}
+
+	config := model.NewProjectConfig()
+	configPath := pm.getConfigPath(name)
+	configJSON, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(configPath, configJSON, 0644)
 }
 
 func (pm *ProjectManager) DeleteProject(name string) error {
@@ -99,4 +114,34 @@ func (pm *ProjectManager) ProjectExists(name string) bool {
 	filePath := filepath.Join(pm.baseDir, name+".json")
 	_, err := os.Stat(filePath)
 	return err == nil
+}
+
+func (pm *ProjectManager) LoadProjectConfig(name string) (model.ProjectConfig, error) {
+	configPath := pm.getConfigPath(name)
+
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return model.NewProjectConfig(), nil
+		}
+		return model.ProjectConfig{}, err
+	}
+
+	var config model.ProjectConfig
+	if err := json.Unmarshal(data, &config); err != nil {
+		return model.ProjectConfig{}, err
+	}
+
+	return config, nil
+}
+
+func (pm *ProjectManager) SaveProjectConfig(name string, config model.ProjectConfig) error {
+	configPath := pm.getConfigPath(name)
+
+	data, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(configPath, data, 0644)
 }

@@ -37,3 +37,13 @@ func NewData() Data {
 		Products:   []Product{},
 	}
 }
+
+type ProjectConfig struct {
+	LastProductID string `json:"lastProductId,omitempty"`
+}
+
+func NewProjectConfig() ProjectConfig {
+	return ProjectConfig{
+		LastProductID: "",
+	}
+}
