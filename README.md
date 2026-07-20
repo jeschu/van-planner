@@ -45,7 +45,12 @@ Die Daten werden standardmäßig in `projekte/default.json` gespeichert.
 | `n` | Neues Produkt erstellen |
 | `e` | Produkt bearbeiten |
 | `d` | Produkt löschen |
+| `K` | Neue Kategorie |
+| `E` | Kategorie bearbeiten |
+| `D` | Kategorie löschen |
 | `/` | Suche öffnen |
+| `Ctrl+O` | Projekt öffnen |
+| `Ctrl+S` | Projekt speichern |
 | `q` | Anwendung beenden |
 
 ### Formular (Create/Edit)

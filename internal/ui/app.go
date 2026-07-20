@@ -19,30 +19,38 @@ const (
 	modeCreateCategory
 	modeEditCategory
 	modeDeleteCategory
+	modeProjectList
 )
 
 type App struct {
-	data         model.Data
-	storage      *storage.JSONStorage
-	list         listModel
-	form         formModel
-	categoryForm categoryFormModel
-	mode         mode
-	quitting     bool
-	message      string
+	data           model.Data
+	storage        *storage.JSONStorage
+	projectManager *storage.ProjectManager
+	list           listModel
+	form           formModel
+	categoryForm   categoryFormModel
+	projectList    projectListModel
+	currentProject string
+	mode           mode
+	quitting       bool
+	message        string
 }
 
-func NewApp(storage *storage.JSONStorage) (*App, error) {
-	data, err := storage.Load()
+func NewApp(s *storage.JSONStorage) (*App, error) {
+	data, err := s.Load()
 	if err != nil {
 		return nil, err
 	}
 
+	pm := storage.NewProjectManager()
+
 	app := &App{
-		data:    data,
-		storage: storage,
-		list:    newListModel(data),
-		mode:    modeList,
+		data:           data,
+		storage:        s,
+		projectManager: pm,
+		list:           newListModel(data),
+		mode:           modeList,
+		currentProject: "default",
 	}
 
 	return app, nil
@@ -57,9 +65,36 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "ctrl+c":
-			if a.mode == modeList {
+			if a.mode == modeList || a.mode == modeProjectList {
 				a.quitting = true
 				return a, tea.Quit
+			}
+		case "ctrl+o":
+			if a.mode == modeList {
+				a.projectList = newProjectListModel(a.projectManager)
+				a.mode = modeProjectList
+				return a, nil
+			}
+		case "ctrl+s":
+			if a.mode == modeList {
+				if err := a.projectManager.SaveProject(a.currentProject, a.data); err != nil {
+					a.message = "Fehler beim Speichern: " + err.Error()
+				} else {
+					a.message = "Projekt gespeichert"
+				}
+				return a, nil
+			}
+		case "ctrl+n":
+			if a.mode == modeList {
+				a.projectList = newProjectListModel(a.projectManager)
+				a.mode = modeProjectList
+				return a, nil
+			}
+		case "ctrl+q":
+			if a.mode == modeList {
+				a.projectList = newProjectListModel(a.projectManager)
+				a.mode = modeProjectList
+				return a, nil
 			}
 		case "n":
 			if a.mode == modeList {
@@ -141,6 +176,20 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, cmd
 	}
 
+	if a.mode == modeProjectList {
+		var cmd tea.Cmd
+		a.projectList, cmd = a.projectList.Update(msg)
+		if a.projectList.IsQuitting() {
+			selected := a.projectList.GetSelectedProject()
+			if selected != nil {
+				a.loadProject(selected.Name)
+			}
+			a.mode = modeList
+			return a, nil
+		}
+		return a, cmd
+	}
+
 	var cmd tea.Cmd
 
 	switch a.mode {
@@ -211,6 +260,8 @@ func (a *App) View() string {
 		return TitleStyle.Render("Neue Kategorie") + "\n\n" + a.categoryForm.View()
 	case modeEditCategory:
 		return TitleStyle.Render("Kategorie bearbeiten") + "\n\n" + a.categoryForm.View()
+	case modeProjectList:
+		return a.projectList.View()
 	default:
 		return a.list.View() + a.statusBar()
 	}
@@ -225,10 +276,10 @@ func (a *App) statusBar() string {
 	}
 
 	status := StatusBarStyle.Render(
-		fmt.Sprintf(" %d/%d erledigt ", completed, len(a.data.Products)),
+		fmt.Sprintf(" %d/%d erledigt | Projekt: %s ", completed, len(a.data.Products), a.currentProject),
 	)
 
-	help := HelpStyle.Render("j/k: Navigation | ↑/↓: Kategorie | Space: Toggle | n: Neu | e: Edit | d: Delete | K: Kat.Neu | E: Kat.Edit | D: Kat.Delete | /: Suche | q: Quit")
+	help := HelpStyle.Render("j/k: Navigation | ↑/↓: Kategorie | Space: Toggle | n: Neu | e: Edit | d: Delete | K: Kat.Neu | E: Kat.Edit | D: Kat.Delete | Ctrl+O: Öffnen | Ctrl+S: Speichern | /: Suche | q: Quit")
 
 	if a.message != "" {
 		return status + "\n\n" + a.message + "\n\n" + help
@@ -311,4 +362,18 @@ func (a *App) deleteCategory(name string) {
 	if err := a.storage.Save(a.data); err != nil {
 		a.message = "Fehler beim Speichern: " + err.Error()
 	}
+}
+
+func (a *App) loadProject(name string) {
+	data, err := a.projectManager.LoadProject(name)
+	if err != nil {
+		a.message = "Fehler beim Laden: " + err.Error()
+		return
+	}
+
+	a.data = data
+	a.currentProject = name
+	a.list = newListModel(data)
+	a.storage = storage.NewJSONStorage(fmt.Sprintf("%s/%s.json", storage.ProjectsDir, name))
+	a.message = "Projekt geladen: " + name
 }

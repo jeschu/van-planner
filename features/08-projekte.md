@@ -1,7 +1,7 @@
 # Feature: Projekte
 
 ## Status
-🔲 Geplant
+✅ Implementiert
 
 ## Beschreibung
 Laden und Speichern von verschiedenen Projekten als separate JSON-Dateien.
@@ -27,9 +27,9 @@ Laden und Speichern von verschiedenen Projekten als separate JSON-Dateien.
 - Aktuelles Projekt in Status-Leiste anzeigen
 
 ## Dateien
-- `internal/storage/project.go` – Projekt-Management
-- `internal/ui/project_list.go` – Projektauswahl
-- `internal/ui/app.go` – Projekt-Wechsel Logik
+- `internal/storage/project.go` – Projekt-Management (ProjectManager)
+- `internal/ui/project_list.go` – Projektauswahl UI
+- `internal/ui/app.go` – Projekt-Wechsel Logik (loadProject)
 - `projekte/*.json` – Projekt-Dateien
 
 ## Tastatur-Shortcuts

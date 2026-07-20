@@ -95,6 +95,7 @@ van-planner/
 | Suche | ✅ Implementiert | Volltextsuche über Name, Notizen, Kategorie |
 | JSON-Persistenz | ✅ Implementiert | Save-on-Change, Load-on-Start |
 | Tastaturbedienung | ✅ Implementiert | Vollständige Keyboard-Navigation |
+| Projekte | ✅ Implementiert | Projekte laden, speichern, wechseln |
 
 ### 🔲 Geplante Features
 
