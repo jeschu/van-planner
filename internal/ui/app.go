@@ -48,7 +48,7 @@ func NewApp(s *storage.JSONStorage) (*App, error) {
 		data:           data,
 		storage:        s,
 		projectManager: pm,
-		list:           newListModel(data),
+		list:           newListModel(data, "default"),
 		mode:           modeList,
 		currentProject: "default",
 	}
@@ -116,7 +116,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				idx := a.list.list.Index()
 				if idx < len(a.data.Products) {
 					a.data.Products = append(a.data.Products[:idx], a.data.Products[idx+1:]...)
-					a.list = newListModel(a.data)
+					a.list = newListModel(a.data, a.currentProject)
 					a.message = "Produkt gelöscht"
 					if err := a.storage.Save(a.data); err != nil {
 						a.message = "Fehler beim Speichern: " + err.Error()
@@ -203,7 +203,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				a.data.Products = append(a.data.Products, product)
 				a.message = "Produkt erstellt"
 			}
-			a.list = newListModel(a.data)
+			a.list = newListModel(a.data, a.currentProject)
 			a.mode = modeList
 			if err := a.storage.Save(a.data); err != nil {
 				a.message = "Fehler beim Speichern: " + err.Error()
@@ -227,7 +227,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					a.message = "Produkt aktualisiert"
 				}
 			}
-			a.list = newListModel(a.data)
+			a.list = newListModel(a.data, a.currentProject)
 			a.mode = modeList
 			if err := a.storage.Save(a.data); err != nil {
 				a.message = "Fehler beim Speichern: " + err.Error()
@@ -277,7 +277,7 @@ func (a *App) statusBar() string {
 	}
 
 	status := StatusBarStyle.Render(
-		fmt.Sprintf(" %d/%d erledigt | Projekt: %s ", completed, len(a.data.Products), a.currentProject),
+		fmt.Sprintf(" %d/%d erledigt ", completed, len(a.data.Products)),
 	)
 
 	help := HelpStyle.Render("j/k: Navigation | Space: Toggle | n: Neu | e: Edit | d: Delete | K: Kat.Neu | E: Kat.Edit | D: Kat.Delete | Ctrl+O: Öffnen | Ctrl+S: Speichern | /: Suche | q: Quit")
@@ -304,7 +304,7 @@ func (a *App) createCategory() {
 	}
 
 	a.data.Categories = append(a.data.Categories, name)
-	a.list = newListModel(a.data)
+	a.list = newListModel(a.data, a.currentProject)
 	a.message = "Kategorie erstellt"
 	if err := a.storage.Save(a.data); err != nil {
 		a.message = "Fehler beim Speichern: " + err.Error()
@@ -344,7 +344,7 @@ func (a *App) editCategory() {
 		}
 	}
 
-	a.list = newListModel(a.data)
+	a.list = newListModel(a.data, a.currentProject)
 	a.message = "Kategorie aktualisiert"
 	if err := a.storage.Save(a.data); err != nil {
 		a.message = "Fehler beim Speichern: " + err.Error()
@@ -359,7 +359,7 @@ func (a *App) deleteCategory(name string) {
 		}
 	}
 
-	a.list = newListModel(a.data)
+	a.list = newListModel(a.data, a.currentProject)
 	if err := a.storage.Save(a.data); err != nil {
 		a.message = "Fehler beim Speichern: " + err.Error()
 	}
@@ -380,7 +380,7 @@ func (a *App) loadProject(name string) {
 
 	a.data = data
 	a.currentProject = name
-	a.list = newListModel(data)
+	a.list = newListModel(data, name)
 	a.storage = storage.NewJSONStorage(fmt.Sprintf("%s/%s.json", storage.ProjectsDir, name))
 	a.message = "Projekt geladen: " + name
 

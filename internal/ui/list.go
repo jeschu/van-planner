@@ -18,9 +18,10 @@ type listModel struct {
 	searchInput   textinput.Model
 	showSearch    bool
 	categoryWidth int
+	projectName   string
 }
 
-func newListModel(data model.Data) listModel {
+func newListModel(data model.Data, projectName string) listModel {
 	items := createGroupedListItems(data)
 
 	l := list.New(items, list.NewDefaultDelegate(), 0, 0)
@@ -39,6 +40,7 @@ func newListModel(data model.Data) listModel {
 		filteredData: data,
 		searchInput:  searchInput,
 		showSearch:   false,
+		projectName:  projectName,
 	}
 }
 
@@ -173,8 +175,9 @@ func (m listModel) Update(msg tea.Msg) (listModel, tea.Cmd) {
 func (m listModel) View() string {
 	var b strings.Builder
 
-	b.WriteString(TitleStyle.Render("Van Planner TUI") + "\n")
-	b.WriteString(SubtitleStyle.Render("Planer für deinen Campervan-Ausbau") + "\n\n")
+	b.WriteString(TitleStyle.Render("Van Planner") + "\n")
+	b.WriteString(SubtitleStyle.Render("Planer für deinen Campervan-Ausbau") + "\n")
+	b.WriteString(ProjectStyle.Render("Projekt: "+m.projectName) + "\n\n")
 
 	if m.showSearch {
 		b.WriteString(m.searchInput.View() + "\n\n")

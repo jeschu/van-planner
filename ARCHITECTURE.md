@@ -1,8 +1,8 @@
-# Van Planner TUI - Architektur
+# Van Planner - Architektur
 
 ## Übersicht
 
-Van Planner TUI ist eine terminal-basierte Anwendung zur Planung von Campervan-Ausbau-Produkten. Die Anwendung folgt dem **Model-View-Controller (MVC)**-Pattern und nutzt die **Bubble Tea**-Architektur.
+Van Planner ist eine terminal-basierte Anwendung zur Planung von Campervan-Ausbau-Produkten. Die Anwendung folgt dem **Model-View-Controller (MVC)**-Pattern und nutzt die **Bubble Tea**-Architektur.
 
 ## Architektur-Übersicht
 

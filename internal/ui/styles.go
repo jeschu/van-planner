@@ -10,6 +10,10 @@ var (
 	SubtitleStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#24A0ED"))
 
+	ProjectStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#626262")).
+			Italic(true)
+
 	ListItemStyle = lipgloss.NewStyle().
 			PaddingLeft(2)
 

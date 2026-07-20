@@ -1,6 +1,6 @@
-# Van Planner TUI
+# Van Planner
 
-Eine Terminal-basierte Anwendung in Go zur Planung von Campervan-Ausbau-Produkten.
+Planer für deinen Campervan-Ausbau.
 
 ## Features
 

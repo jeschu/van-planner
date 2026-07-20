@@ -1,4 +1,4 @@
-# Van Planner TUI - Implementierungsplan
+# Van Planner - Implementierungsplan
 
 ## Übersicht
 

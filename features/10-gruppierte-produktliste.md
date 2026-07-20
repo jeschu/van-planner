@@ -40,8 +40,9 @@ Keine Änderungen am Datenmodell. Gruppierung erfolgt nur in der UI-Darstellung.
 
 ## UI-Beispiel
 ```
-Van Planner TUI
+Van Planner
 Planer für deinen Campervan-Ausbau
+Projekt: default
 
 Elektrik
   [ ] Solarpanel 400W

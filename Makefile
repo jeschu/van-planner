@@ -1,4 +1,6 @@
-.PHONY: build run test clean
+.PHONY: build run test clean all
+
+all: clean run
 
 build:
 	go build -o van-planner ./cmd/van-planner
