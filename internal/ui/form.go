@@ -29,7 +29,7 @@ type formModel struct {
 	err         error
 }
 
-func newFormModel(data model.Data, editProduct *model.Product) formModel {
+func newFormModel(data model.Data, editProduct *model.Product, category string) formModel {
 	inputs := make([]textinput.Model, 5)
 
 	inputs[0] = textinput.New()
@@ -66,6 +66,8 @@ func newFormModel(data model.Data, editProduct *model.Product) formModel {
 		}
 		inputs[3].SetValue(editProduct.ShopLink)
 		inputs[4].SetValue(editProduct.Notes)
+	} else if category != "" {
+		inputs[1].SetValue(category)
 	} else if len(data.Categories) > 0 {
 		inputs[1].SetValue(data.Categories[0])
 	}

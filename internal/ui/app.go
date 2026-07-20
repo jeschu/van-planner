@@ -59,7 +59,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "n":
 			if a.mode == modeList {
-				a.form = newFormModel(a.data, nil)
+				a.form = newFormModel(a.data, nil, a.list.GetCurrentCategory())
 				a.mode = modeCreate
 				return a, textinput.Blink
 			}
@@ -67,7 +67,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if a.mode == modeList && len(a.data.Products) > 0 {
 				idx := a.list.list.Index()
 				if idx < len(a.data.Products) {
-					a.form = newFormModel(a.data, &a.data.Products[idx])
+					a.form = newFormModel(a.data, &a.data.Products[idx], "")
 					a.mode = modeEdit
 					return a, textinput.Blink
 				}
@@ -176,7 +176,7 @@ func (a *App) statusBar() string {
 		fmt.Sprintf(" %d/%d erledigt ", completed, len(a.data.Products)),
 	)
 
-	help := HelpStyle.Render("j/k: Navigation | Space: Toggle | n: Neu | e: Edit | d: Delete | q: Quit")
+	help := HelpStyle.Render("j/k: Navigation | ←/→: Kategorie | Space: Toggle | n: Neu | e: Edit | d: Delete | /: Suche | q: Quit")
 
 	if a.message != "" {
 		return status + "\n\n" + a.message + "\n\n" + help
