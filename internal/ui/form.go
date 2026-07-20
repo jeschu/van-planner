@@ -15,7 +15,8 @@ type FormState int
 const (
 	StateName FormState = iota
 	StateCategory
-	StatePrice
+	StateEstimatedCost
+	StateActualCost
 	StateShopLink
 	StateNotes
 )
@@ -30,7 +31,7 @@ type formModel struct {
 }
 
 func newFormModel(data model.Data, editProduct *model.Product, category string) formModel {
-	inputs := make([]textinput.Model, 5)
+	inputs := make([]textinput.Model, 6)
 
 	inputs[0] = textinput.New()
 	inputs[0].Placeholder = "Produktname"
@@ -44,28 +45,36 @@ func newFormModel(data model.Data, editProduct *model.Product, category string) 
 	inputs[1].Width = 40
 
 	inputs[2] = textinput.New()
-	inputs[2].Placeholder = "Preis (€)"
-	inputs[2].CharLimit = 10
-	inputs[2].Width = 20
+	inputs[2].Placeholder = "Kosten geschätzt (€)"
+	inputs[2].CharLimit = 15
+	inputs[2].Width = 25
 
 	inputs[3] = textinput.New()
-	inputs[3].Placeholder = "Shop-Link"
-	inputs[3].CharLimit = 200
-	inputs[3].Width = 40
+	inputs[3].Placeholder = "Kosten tatsächlich (€)"
+	inputs[3].CharLimit = 15
+	inputs[3].Width = 25
 
 	inputs[4] = textinput.New()
-	inputs[4].Placeholder = "Notizen"
-	inputs[4].CharLimit = 500
+	inputs[4].Placeholder = "Shop-Link"
+	inputs[4].CharLimit = 200
 	inputs[4].Width = 40
+
+	inputs[5] = textinput.New()
+	inputs[5].Placeholder = "Notizen"
+	inputs[5].CharLimit = 500
+	inputs[5].Width = 40
 
 	if editProduct != nil {
 		inputs[0].SetValue(editProduct.Name)
 		inputs[1].SetValue(editProduct.Category)
-		if editProduct.Price > 0 {
-			inputs[2].SetValue(fmt.Sprintf("%.2f", editProduct.Price))
+		if editProduct.EstimatedCost > 0 {
+			inputs[2].SetValue(fmt.Sprintf("%.2f", editProduct.EstimatedCost))
 		}
-		inputs[3].SetValue(editProduct.ShopLink)
-		inputs[4].SetValue(editProduct.Notes)
+		if editProduct.ActualCost > 0 {
+			inputs[3].SetValue(fmt.Sprintf("%.2f", editProduct.ActualCost))
+		}
+		inputs[4].SetValue(editProduct.ShopLink)
+		inputs[5].SetValue(editProduct.Notes)
 	} else if category != "" {
 		inputs[1].SetValue(category)
 	} else if len(data.Categories) > 0 {
@@ -140,7 +149,7 @@ func (m formModel) View() string {
 	b.WriteString(TitleStyle.Render("Produkt ") + "\n")
 	b.WriteString("\n")
 
-	labels := []string{"Name:", "Kategorie:", "Preis:", "Shop-Link:", "Notizen:"}
+	labels := []string{"Name:", "Kategorie:", "Kosten geschätzt:", "Kosten tatsächlich:", "Shop-Link:", "Notizen:"}
 
 	for i := range m.inputs {
 		b.WriteString(labels[i] + "\n")
@@ -164,20 +173,31 @@ func (m formModel) GetProduct(data model.Data) (model.Product, error) {
 		category = data.Categories[0]
 	}
 
-	var price float64
-	priceStr := strings.TrimSpace(m.inputs[2].Value())
-	if priceStr != "" {
+	var estimatedCost float64
+	estimatedStr := strings.TrimSpace(m.inputs[2].Value())
+	if estimatedStr != "" {
 		var err error
-		price, err = strconv.ParseFloat(priceStr, 64)
+		estimatedCost, err = strconv.ParseFloat(estimatedStr, 64)
 		if err != nil {
-			return model.Product{}, fmt.Errorf("Ungültiger Preis: %v", err)
+			return model.Product{}, fmt.Errorf("Ungültige geschätzte Kosten: %v", err)
+		}
+	}
+
+	var actualCost float64
+	actualStr := strings.TrimSpace(m.inputs[3].Value())
+	if actualStr != "" {
+		var err error
+		actualCost, err = strconv.ParseFloat(actualStr, 64)
+		if err != nil {
+			return model.Product{}, fmt.Errorf("Ungültige tatsächliche Kosten: %v", err)
 		}
 	}
 
 	product := model.NewProduct(name, category)
-	product.Price = price
-	product.ShopLink = strings.TrimSpace(m.inputs[3].Value())
-	product.Notes = strings.TrimSpace(m.inputs[4].Value())
+	product.EstimatedCost = estimatedCost
+	product.ActualCost = actualCost
+	product.ShopLink = strings.TrimSpace(m.inputs[4].Value())
+	product.Notes = strings.TrimSpace(m.inputs[5].Value())
 
 	return product, nil
 }

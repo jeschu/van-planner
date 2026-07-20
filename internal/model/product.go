@@ -3,26 +3,28 @@ package model
 import "github.com/google/uuid"
 
 type Product struct {
-	ID           string                 `json:"id"`
-	Name         string                 `json:"name"`
-	Category     string                 `json:"category"`
-	Completed    bool                   `json:"completed"`
-	Price        float64                `json:"price"`
-	ShopLink     string                 `json:"shopLink"`
-	Notes        string                 `json:"notes"`
-	CustomFields map[string]interface{} `json:"customFields"`
+	ID            string                 `json:"id"`
+	Name          string                 `json:"name"`
+	Category      string                 `json:"category"`
+	Completed     bool                   `json:"completed"`
+	EstimatedCost float64                `json:"estimatedCost"`
+	ActualCost    float64                `json:"actualCost"`
+	ShopLink      string                 `json:"shopLink"`
+	Notes         string                 `json:"notes"`
+	CustomFields  map[string]interface{} `json:"customFields"`
 }
 
 func NewProduct(name, category string) Product {
 	return Product{
-		ID:           uuid.New().String(),
-		Name:         name,
-		Category:     category,
-		Completed:    false,
-		Price:        0.0,
-		ShopLink:     "",
-		Notes:        "",
-		CustomFields: make(map[string]interface{}),
+		ID:            uuid.New().String(),
+		Name:          name,
+		Category:      category,
+		Completed:     false,
+		EstimatedCost: 0.0,
+		ActualCost:    0.0,
+		ShopLink:      "",
+		Notes:         "",
+		CustomFields:  make(map[string]interface{}),
 	}
 }
 

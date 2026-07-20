@@ -4,14 +4,17 @@
 ✅ Implementiert
 
 ## Beschreibung
-Alle Produkte werden in einer einzigen Liste angezeigt, gruppiert nach Kategorien. Kategorie-Header strukturieren die Liste visuell.
+Alle Produkte werden in einer tabellarischen Ansicht angezeigt, gruppiert nach Kategorien. Jede Zeile zeigt Produktname, geschätzte Kosten, tatsächliche Kosten und Link. Kategorie-Summen und Gesamtsumme werden automatisch berechnet.
 
 ## Funktionalität
 
-### Gruppierte Anzeige
-- Alle Produkte werden in einer Liste angezeigt
+### Tabellarische Anzeige
+- Alle Produkte werden in einer Tabelle angezeigt
+- Spalten: Produktname, Kosten geschätzt, Kosten tatsächlich, Link
 - Produkte sind nach Kategorien gruppiert
 - Kategorie-Header zeigen den Kategorie-Namen
+- Zwischensumme pro Kategorie (geschätzt und tatsächlich)
+- Gesamtsumme aller Kategorien am Ende der Tabelle
 - Produkte innerhalb einer Kategorie sortiert
 
 ### Navigation
@@ -25,7 +28,9 @@ Alle Produkte werden in einer einzigen Liste angezeigt, gruppiert nach Kategorie
 - Suche filtert nach Produktname, Notizen und Kategorie
 
 ## Dateien
-- `internal/ui/list.go` – Gruppierte Listen-Ansicht (createGroupedListItems, groupedListItem)
+- `internal/model/product.go` – Datenmodell (EstimatedCost, ActualCost)
+- `internal/ui/list.go` – Tabellarische Ansicht mit Summenberechnung
+- `internal/ui/form.go` – Formular mit zwei Kosten-Feldern
 
 ## Tastatur-Shortcuts
 | Taste | Aktion |
@@ -36,23 +41,35 @@ Alle Produkte werden in einer einzigen Liste angezeigt, gruppiert nach Kategorie
 | `/` | Suche öffnen |
 
 ## Datenmodell
-Keine Änderungen am Datenmodell. Gruppierung erfolgt nur in der UI-Darstellung.
+```json
+{
+  "id": "uuid",
+  "name": "Produktname",
+  "category": "Kategorie",
+  "completed": false,
+  "estimatedCost": 0.0,
+  "actualCost": 0.0,
+  "shopLink": "",
+  "notes": "",
+  "customFields": {}
+}
+```
 
 ## UI-Beispiel
 ```
-Van Planner
-Planer für deinen Campervan-Ausbau
+Van Planner – Planer für deinen Campervan-Ausbau
 Projekt: default
 
-Elektrik
-  [ ] Solarpanel 400W
-  [✓] Laderegler 30A
-  [ ] Batterie 200Ah
+Fahrzeug
+  Ducato                                          20.000,00 €              0,00 €
+  Summe                                           20.000,00 €              0,00 €
 
-Wasser
-  [ ] Frischwassertank 100L
-  [✓] Wasserpumpe
-  [ ] Warmwasserbereiter
+Werkzeug
+  [ ] Blindnietzange                                 23,00 €              0,00 €  https://amazon.de/...
+  [✓] Akku-Schrauber/Bohrer                          30,95 €              0,00 €  https://amazon.de/...
+  Summe                                             150,60 €              0,00 €
+
+Gesamtsumme                                       25.025,47 €              0,00 €
 ```
 
 ## Abhängigkeiten

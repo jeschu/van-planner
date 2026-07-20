@@ -45,34 +45,42 @@ func newListModel(data model.Data, projectName string) listModel {
 }
 
 type groupedListItem struct {
-	category string
-	product  model.Product
-	isHeader bool
+	category          string
+	product           model.Product
+	isHeader          bool
+	isSum             bool
+	categorySum       float64
+	categoryActualSum float64
+	totalSum          float64
+	totalActualSum    float64
 }
 
 func (i groupedListItem) Title() string {
 	if i.isHeader {
 		return i.category
 	}
+	if i.isSum {
+		return "Summe"
+	}
 	completed := " "
 	if i.product.Completed {
 		completed = "✓"
 	}
-	return fmt.Sprintf("  [%s] %s", completed, i.product.Name)
+	return fmt.Sprintf("[%s] %s", completed, i.product.Name)
 }
 
 func (i groupedListItem) Description() string {
 	if i.isHeader {
 		return ""
 	}
-	if i.product.Price > 0 {
-		return fmt.Sprintf("%.2f €", i.product.Price)
+	if i.isSum {
+		return fmt.Sprintf("%.2f € | %.2f €", i.categorySum, i.categoryActualSum)
 	}
-	return ""
+	return fmt.Sprintf("%.2f € | %.2f €", i.product.EstimatedCost, i.product.ActualCost)
 }
 
 func (i groupedListItem) FilterValue() string {
-	if i.isHeader {
+	if i.isHeader || i.isSum {
 		return ""
 	}
 	return i.product.Name + " " + i.product.Category
@@ -80,14 +88,46 @@ func (i groupedListItem) FilterValue() string {
 
 func createGroupedListItems(data model.Data) []list.Item {
 	var items []list.Item
+	var grandTotal float64
+	var grandTotalActual float64
+
 	for _, cat := range data.Categories {
 		items = append(items, groupedListItem{category: cat, isHeader: true})
+
+		catSum := 0.0
+		catActualSum := 0.0
+
 		for _, p := range data.Products {
 			if p.Category == cat {
-				items = append(items, groupedListItem{category: cat, product: p, isHeader: false})
+				items = append(items, groupedListItem{
+					category: cat,
+					product:  p,
+					isHeader: false,
+				})
+				catSum += p.EstimatedCost
+				catActualSum += p.ActualCost
 			}
 		}
+
+		items = append(items, groupedListItem{
+			category:          cat,
+			isHeader:          false,
+			isSum:             true,
+			categorySum:       catSum,
+			categoryActualSum: catActualSum,
+		})
+
+		grandTotal += catSum
+		grandTotalActual += catActualSum
 	}
+
+	items = append(items, groupedListItem{
+		isHeader:       false,
+		isSum:          true,
+		totalSum:       grandTotal,
+		totalActualSum: grandTotalActual,
+	})
+
 	return items
 }
 
@@ -148,7 +188,7 @@ func (m listModel) Update(msg tea.Msg) (listModel, tea.Cmd) {
 			idx := m.list.Index()
 			items := m.list.Items()
 			if idx < len(items) {
-				if item, ok := items[idx].(groupedListItem); ok && !item.isHeader {
+				if item, ok := items[idx].(groupedListItem); ok && !item.isHeader && !item.isSum {
 					for i := range m.data.Products {
 						if m.data.Products[i].ID == item.product.ID {
 							m.data.Products[i].Completed = !m.data.Products[i].Completed
@@ -186,7 +226,123 @@ func (m listModel) View() string {
 		b.WriteString("Keine Produkte. Drücke 'n' um ein neues Produkt zu erstellen.\n\n")
 	}
 
+	b.WriteString(renderTable(m))
+	b.WriteString("\n")
+
 	return b.String() + m.list.View()
+}
+
+func renderTable(m listModel) string {
+	var b strings.Builder
+
+	items := m.list.Items()
+	if len(items) == 0 {
+		return ""
+	}
+
+	nameWidth := 50
+	estimatedWidth := 15
+	actualWidth := 15
+	linkWidth := 40
+
+	for _, item := range items {
+		if gi, ok := item.(groupedListItem); ok {
+			if !gi.isHeader && !gi.isSum {
+				if len(gi.product.Name) > nameWidth {
+					nameWidth = len(gi.product.Name)
+				}
+				estimatedStr := fmt.Sprintf("%.2f €", gi.product.EstimatedCost)
+				if len(estimatedStr) > estimatedWidth {
+					estimatedWidth = len(estimatedStr)
+				}
+				actualStr := fmt.Sprintf("%.2f €", gi.product.ActualCost)
+				if len(actualStr) > actualWidth {
+					actualWidth = len(actualStr)
+				}
+				if len(gi.product.ShopLink) > linkWidth {
+					linkWidth = len(gi.product.ShopLink)
+				}
+			}
+		}
+	}
+
+	if nameWidth > 60 {
+		nameWidth = 60
+	}
+	if linkWidth > 50 {
+		linkWidth = 50
+	}
+
+	b.WriteString(renderHeader(nameWidth, estimatedWidth, actualWidth, linkWidth))
+
+	for _, item := range items {
+		if gi, ok := item.(groupedListItem); ok {
+			if gi.isHeader {
+				b.WriteString(renderCategoryHeader(gi.category, nameWidth, estimatedWidth, actualWidth, linkWidth))
+			} else if gi.isSum && gi.totalSum > 0 {
+				b.WriteString(renderTotalSum(gi.totalSum, gi.totalActualSum, nameWidth, estimatedWidth, actualWidth, linkWidth))
+			} else if gi.isSum {
+				b.WriteString(renderCategorySum(gi.categorySum, gi.categoryActualSum, nameWidth, estimatedWidth, actualWidth, linkWidth))
+			} else {
+				b.WriteString(renderProductRow(gi.product, nameWidth, estimatedWidth, actualWidth, linkWidth))
+			}
+		}
+	}
+
+	return b.String()
+}
+
+func renderHeader(nameWidth, estimatedWidth, actualWidth, linkWidth int) string {
+	header := fmt.Sprintf("%-*s %*s %*s %s\n",
+		nameWidth, "Produkt",
+		estimatedWidth, "Kosten geschätzt",
+		actualWidth, "Kosten tatsächlich",
+		"Link")
+	return CategoryStyle.Render(header)
+}
+
+func renderCategoryHeader(category string, nameWidth, estimatedWidth, actualWidth, linkWidth int) string {
+	totalWidth := nameWidth + estimatedWidth + actualWidth + linkWidth + 6
+	separator := strings.Repeat("─", totalWidth)
+	return "\n" + CategoryStyle.Render(category) + "\n" + separator + "\n"
+}
+
+func renderProductRow(p model.Product, nameWidth, estimatedWidth, actualWidth, linkWidth int) string {
+	completed := "  "
+	if p.Completed {
+		completed = "✓ "
+	}
+
+	name := p.Name
+	if len(name) > nameWidth {
+		name = name[:nameWidth-3] + "..."
+	}
+
+	estimated := fmt.Sprintf("%*.2f €", estimatedWidth, p.EstimatedCost)
+	actual := fmt.Sprintf("%*.2f €", actualWidth, p.ActualCost)
+
+	link := p.ShopLink
+	if len(link) > linkWidth {
+		link = link[:linkWidth-3] + "..."
+	}
+
+	return fmt.Sprintf("%s%-*s %s %s %s\n", completed, nameWidth, name, estimated, actual, link)
+}
+
+func renderCategorySum(catSum, catActualSum float64, nameWidth, estimatedWidth, actualWidth, linkWidth int) string {
+	sumStr := fmt.Sprintf("%-*s %*.2f € %*.2f €\n",
+		nameWidth+2, "Summe",
+		estimatedWidth, catSum,
+		actualWidth, catActualSum)
+	return sumStr
+}
+
+func renderTotalSum(totalSum, totalActualSum float64, nameWidth, estimatedWidth, actualWidth, linkWidth int) string {
+	sumStr := fmt.Sprintf("\n%-*s %*.2f € %*.2f €\n",
+		nameWidth+2, "Gesamtsumme",
+		estimatedWidth, totalSum,
+		actualWidth, totalActualSum)
+	return CategoryStyle.Render(sumStr)
 }
 
 func (m listModel) SetSize(width, height int) {
@@ -202,7 +358,7 @@ func (m listModel) GetCurrentCategory() string {
 	idx := m.list.Index()
 	items := m.list.Items()
 	if idx < len(items) {
-		if item, ok := items[idx].(groupedListItem); ok && !item.isHeader {
+		if item, ok := items[idx].(groupedListItem); ok && !item.isHeader && !item.isSum {
 			return item.product.Category
 		}
 	}
