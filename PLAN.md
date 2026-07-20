@@ -60,7 +60,7 @@ van-planner/
 │       ├── form.go
 │       └── styles.go
 ├── projekte/
-│   └── default.json
+│   └── config.json
 ├── go.mod
 └── go.sum
 ```

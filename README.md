@@ -29,7 +29,7 @@ go build -o van-planner ./cmd/van-planner
 ./van-planner
 ```
 
-Die Daten werden standardmäßig in `projekte/default.json` gespeichert.
+Die Daten werden standardmäßig in `projekte/config.json` gespeichert.
 
 ## Bedienung
 

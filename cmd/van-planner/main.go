@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	storage := storage.NewJSONStorage("projekte/products.json")
+	storage := storage.NewJSONStorage("projekte/config.json")
 
 	app, err := ui.NewApp(storage)
 	if err != nil {

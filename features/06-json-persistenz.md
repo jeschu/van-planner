@@ -9,7 +9,7 @@ Lokale Speicherung aller Daten im JSON-Format.
 ## Funktionalität
 
 ### Speicherort
-- Standard: `projekte/default.json`
+- Standard: `projekte/config.json`
 - Automatische Verzeichnis-Erstellung
 
 ### Save-On-Change

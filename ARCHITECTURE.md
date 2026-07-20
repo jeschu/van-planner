@@ -54,7 +54,7 @@ van-planner/
 │       ├── form.go          # Formular für Create/Edit
 │       └── styles.go        # Lipgloss Styles
 ├── data/
-│   └── products.json        # Datenspeicher
+│   └── config.json          # Datenspeicher
 ├── go.mod
 ├── go.sum
 ├── README.md
@@ -230,7 +230,7 @@ const (
 
 ### Neue Kategorien
 
-Kategorien sind dynamisch in `data/products.json` definierbar.
+Kategorien sind dynamisch in `data/config.json` definierbar.
 
 ### Neue Produkt-Attribute
 
