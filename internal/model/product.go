@@ -29,13 +29,14 @@ func NewProduct(name, category string) Product {
 }
 
 type Data struct {
-	Categories []string  `json:"categories"`
-	Products   []Product `json:"products"`
+	Categories    []string  `json:"categories"`
+	Products      []Product `json:"products"`
+	LastProductID string    `json:"lastProductId,omitempty"`
 }
 
 func NewData() Data {
 	return Data{
-		Categories: []string{"Fahrzeug", "Elektrik", "Wasser", "Küche", "Schlafen", "Stauraum"},
+		Categories: []string{"Fahrzeug", "Werkzeug", "Dämmung", "Heizung", "Wasser", "Fenster", "Elektrik"},
 		Products:   []Product{},
 	}
 }
