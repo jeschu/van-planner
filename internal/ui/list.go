@@ -89,17 +89,9 @@ func (m listModel) View() string {
 	b.WriteString(TitleStyle.Render("Van Planner TUI") + "\n")
 	b.WriteString(SubtitleStyle.Render("Planer für deinen Campervan-Ausbau") + "\n\n")
 
-	completed := 0
-	for _, p := range m.data.Products {
-		if p.Completed {
-			completed++
-		}
+	if len(m.data.Products) == 0 {
+		b.WriteString("Keine Produkte. Drücke 'n' um ein neues Produkt zu erstellen.\n\n")
 	}
-
-	b.WriteString(fmt.Sprintf("Fortschritt: %d/%d erledigt\n", completed, len(m.data.Products)))
-	b.WriteString("\n")
-	b.WriteString(HelpStyle.Render("j/k: Navigation | Space: Toggle | q: Quit"))
-	b.WriteString("\n")
 
 	return b.String() + m.list.View()
 }
