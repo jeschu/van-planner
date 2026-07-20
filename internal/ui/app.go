@@ -280,7 +280,7 @@ func (a *App) statusBar() string {
 		fmt.Sprintf(" %d/%d erledigt | Projekt: %s ", completed, len(a.data.Products), a.currentProject),
 	)
 
-	help := HelpStyle.Render("j/k: Navigation | ↑/↓: Kategorie | Space: Toggle | n: Neu | e: Edit | d: Delete | K: Kat.Neu | E: Kat.Edit | D: Kat.Delete | Ctrl+O: Öffnen | Ctrl+S: Speichern | /: Suche | q: Quit")
+	help := HelpStyle.Render("j/k: Navigation | Space: Toggle | n: Neu | e: Edit | d: Delete | K: Kat.Neu | E: Kat.Edit | D: Kat.Delete | Ctrl+O: Öffnen | Ctrl+S: Speichern | /: Suche | q: Quit")
 
 	if a.message != "" {
 		return status + "\n\n" + a.message + "\n\n" + help

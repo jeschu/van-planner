@@ -10,29 +10,6 @@ import (
 	"github.com/jens/van-planner/internal/model"
 )
 
-type listItem struct {
-	product model.Product
-}
-
-func (i listItem) Title() string {
-	completed := " "
-	if i.product.Completed {
-		completed = "✓"
-	}
-	return fmt.Sprintf("[%s] %s", completed, i.product.Name)
-}
-
-func (i listItem) Description() string {
-	if i.product.Price > 0 {
-		return fmt.Sprintf("%.2f €", i.product.Price)
-	}
-	return ""
-}
-
-func (i listItem) FilterValue() string {
-	return i.product.Name + " " + i.product.Category
-}
-
 type listModel struct {
 	list          list.Model
 	data          model.Data
@@ -44,13 +21,12 @@ type listModel struct {
 }
 
 func newListModel(data model.Data) listModel {
-	filtered := filterByCategory(data, data.Categories[0])
-	items := createListItems(filtered)
+	items := createGroupedListItems(data)
 
 	l := list.New(items, list.NewDefaultDelegate(), 0, 0)
 	l.Title = ""
 	l.SetShowStatusBar(false)
-	l.SetFilteringEnabled(false)
+	l.SetShowHelp(false)
 
 	searchInput := textinput.New()
 	searchInput.Placeholder = "Suche..."
@@ -58,34 +34,59 @@ func newListModel(data model.Data) listModel {
 	searchInput.Width = 30
 
 	return listModel{
-		list:          l,
-		data:          data,
-		filteredData:  filtered,
-		categoryIndex: 0,
-		searchInput:   searchInput,
-		showSearch:    false,
+		list:         l,
+		data:         data,
+		filteredData: data,
+		searchInput:  searchInput,
+		showSearch:   false,
 	}
 }
 
-func createListItems(data model.Data) []list.Item {
-	items := make([]list.Item, len(data.Products))
-	for i, p := range data.Products {
-		items[i] = listItem{product: p}
-	}
-	return items
+type groupedListItem struct {
+	category string
+	product  model.Product
+	isHeader bool
 }
 
-func filterByCategory(data model.Data, category string) model.Data {
-	filtered := model.Data{
-		Categories: data.Categories,
-		Products:   []model.Product{},
+func (i groupedListItem) Title() string {
+	if i.isHeader {
+		return i.category
 	}
-	for _, p := range data.Products {
-		if p.Category == category {
-			filtered.Products = append(filtered.Products, p)
+	completed := " "
+	if i.product.Completed {
+		completed = "✓"
+	}
+	return fmt.Sprintf("  [%s] %s", completed, i.product.Name)
+}
+
+func (i groupedListItem) Description() string {
+	if i.isHeader {
+		return ""
+	}
+	if i.product.Price > 0 {
+		return fmt.Sprintf("%.2f €", i.product.Price)
+	}
+	return ""
+}
+
+func (i groupedListItem) FilterValue() string {
+	if i.isHeader {
+		return ""
+	}
+	return i.product.Name + " " + i.product.Category
+}
+
+func createGroupedListItems(data model.Data) []list.Item {
+	var items []list.Item
+	for _, cat := range data.Categories {
+		items = append(items, groupedListItem{category: cat, isHeader: true})
+		for _, p := range data.Products {
+			if p.Category == cat {
+				items = append(items, groupedListItem{category: cat, product: p, isHeader: false})
+			}
 		}
 	}
-	return filtered
+	return items
 }
 
 func filterBySearch(data model.Data, query string) model.Data {
@@ -125,13 +126,13 @@ func (m listModel) Update(msg tea.Msg) (listModel, tea.Cmd) {
 			case "esc":
 				m.showSearch = false
 				m.searchInput.SetValue("")
-				m.filteredData = filterByCategory(m.data, m.data.Categories[m.categoryIndex])
-				m.list.SetItems(createListItems(m.filteredData))
+				m.filteredData = m.data
+				m.list.SetItems(createGroupedListItems(m.filteredData))
 				return m, tea.Batch(cmds...)
 			case "enter":
 				m.showSearch = false
-				m.filteredData = filterBySearch(m.filteredData, m.searchInput.Value())
-				m.list.SetItems(createListItems(m.filteredData))
+				m.filteredData = filterBySearch(m.data, m.searchInput.Value())
+				m.list.SetItems(createGroupedListItems(m.filteredData))
 				return m, tea.Batch(cmds...)
 			}
 		}
@@ -142,56 +143,25 @@ func (m listModel) Update(msg tea.Msg) (listModel, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case " ":
-			if len(m.filteredData.Products) > 0 {
-				idx := m.list.Index()
-				if idx < len(m.filteredData.Products) {
+			idx := m.list.Index()
+			items := m.list.Items()
+			if idx < len(items) {
+				if item, ok := items[idx].(groupedListItem); ok && !item.isHeader {
 					for i := range m.data.Products {
-						if m.data.Products[i].ID == m.filteredData.Products[idx].ID {
+						if m.data.Products[i].ID == item.product.ID {
 							m.data.Products[i].Completed = !m.data.Products[i].Completed
 							break
 						}
 					}
-					m.filteredData = filterByCategory(m.data, m.data.Categories[m.categoryIndex])
-					m.list.SetItems(createListItems(m.filteredData))
+					m.filteredData = m.data
+					m.list.SetItems(createGroupedListItems(m.filteredData))
 				}
-			}
-			return m, nil
-		case "j", "down":
-			if m.list.Index() >= len(m.filteredData.Products)-1 {
-				m.categoryIndex++
-				if m.categoryIndex >= len(m.data.Categories) {
-					m.categoryIndex = 0
-				}
-				m.filteredData = filterByCategory(m.data, m.data.Categories[m.categoryIndex])
-				m.list.SetItems(createListItems(m.filteredData))
-			} else {
-				m.list.CursorDown()
-			}
-			return m, nil
-		case "k", "up":
-			if m.list.Index() == 0 {
-				m.categoryIndex--
-				if m.categoryIndex < 0 {
-					m.categoryIndex = len(m.data.Categories) - 1
-				}
-				m.filteredData = filterByCategory(m.data, m.data.Categories[m.categoryIndex])
-				m.list.SetItems(createListItems(m.filteredData))
-			} else {
-				m.list.CursorUp()
 			}
 			return m, nil
 		case "/":
 			m.showSearch = true
 			m.searchInput.Focus()
 			return m, textinput.Blink
-		case "1", "2", "3", "4", "5":
-			idx := int(msg.String()[0] - '1')
-			if idx < len(m.data.Categories) {
-				m.categoryIndex = idx
-				m.filteredData = filterByCategory(m.data, m.data.Categories[m.categoryIndex])
-				m.list.SetItems(createListItems(m.filteredData))
-			}
-			return m, nil
 		}
 	}
 
@@ -206,41 +176,15 @@ func (m listModel) View() string {
 	b.WriteString(TitleStyle.Render("Van Planner TUI") + "\n")
 	b.WriteString(SubtitleStyle.Render("Planer für deinen Campervan-Ausbau") + "\n\n")
 
-	b.WriteString(m.categoryList())
-	b.WriteString("\n")
-
 	if m.showSearch {
 		b.WriteString(m.searchInput.View() + "\n\n")
 	}
 
-	if len(m.filteredData.Products) == 0 {
-		if len(m.data.Products) == 0 {
-			b.WriteString("Keine Produkte. Drücke 'n' um ein neues Produkt zu erstellen.\n\n")
-		} else {
-			b.WriteString("Keine Produkte in dieser Kategorie.\n\n")
-		}
+	if len(m.data.Products) == 0 {
+		b.WriteString("Keine Produkte. Drücke 'n' um ein neues Produkt zu erstellen.\n\n")
 	}
 
 	return b.String() + m.list.View()
-}
-
-func (m listModel) categoryList() string {
-	var categories []string
-	for i, cat := range m.data.Categories {
-		count := 0
-		for _, p := range m.data.Products {
-			if p.Category == cat {
-				count++
-			}
-		}
-
-		if i == m.categoryIndex {
-			categories = append(categories, CategoryStyle.Render(fmt.Sprintf("▶ [%d] %s (%d)", i+1, cat, count)))
-		} else {
-			categories = append(categories, fmt.Sprintf("  [%d] %s (%d)", i+1, cat, count))
-		}
-	}
-	return strings.Join(categories, "\n")
 }
 
 func (m listModel) SetSize(width, height int) {
@@ -253,8 +197,15 @@ func (m listModel) GetData() model.Data {
 }
 
 func (m listModel) GetCurrentCategory() string {
+	idx := m.list.Index()
+	items := m.list.Items()
+	if idx < len(items) {
+		if item, ok := items[idx].(groupedListItem); ok && !item.isHeader {
+			return item.product.Category
+		}
+	}
 	if len(m.data.Categories) > 0 {
-		return m.data.Categories[m.categoryIndex]
+		return m.data.Categories[0]
 	}
 	return ""
 }
