@@ -4,17 +4,15 @@
 ✅ Implementiert
 
 ## Beschreibung
-Vollständige Bedienung der Anwendung über Tastatur-Shortcuts.
+Vollständige Bedienung der Anwendung über Tastatur-Shortcuts mit kontextspezifischer Help-Leiste und detaillierter Hilfe-Seite.
 
 ## Funktionalität
 
 ### Navigation
 | Taste | Aktion |
 |-------|--------|
-| `j` / `↓` | Runter navigieren |
-| `k` / `↑` | Hoch navigieren |
-| `←` / `→` | Kategorie wechseln |
-| `1` - `5` | Direkte Kategorie-Auswahl |
+| `j` / `↓` | Nächstes Produkt |
+| `k` / `↑` | Vorheriges Produkt |
 
 ### Aktionen
 | Taste | Aktion |
@@ -24,6 +22,19 @@ Vollständige Bedienung der Anwendung über Tastatur-Shortcuts.
 | `e` | Produkt bearbeiten |
 | `d` | Produkt löschen |
 | `/` | Suche öffnen |
+
+### Kategorien
+| Taste | Aktion |
+|-------|--------|
+| `K` | Neue Kategorie |
+| `E` | Kategorie bearbeiten |
+| `D` | Kategorie löschen |
+
+### Projekte
+| Taste | Aktion |
+|-------|--------|
+| `Ctrl+O` | Projekt öffnen |
+| `Ctrl+S` | Projekt speichern |
 
 ### Formular
 | Taste | Aktion |
@@ -36,6 +47,7 @@ Vollständige Bedienung der Anwendung über Tastatur-Shortcuts.
 ### Allgemein
 | Taste | Aktion |
 |-------|--------|
+| `?` | Hilfe-Seite öffnen |
 | `q` | Anwendung beenden |
 | `Ctrl+C` | Anwendung beenden |
 
@@ -43,9 +55,25 @@ Vollständige Bedienung der Anwendung über Tastatur-Shortcuts.
 - `internal/ui/app.go` – Globale Shortcuts
 - `internal/ui/list.go` – Listen-Shortcuts
 - `internal/ui/form.go` – Formular-Shortcuts
+- `internal/ui/help.go` – Hilfe-Seite und kontextspezifische Help
 
 ## Help-Leiste
-Alle Shortcuts werden in der Help-Leiste unten angezeigt:
+Die Help-Leiste zeigt nur die im aktuellen Kontext verfügbaren Shortcuts:
+
+### Listen-Ansicht
 ```
-j/k: Navigation | ←/→: Kategorie | Space: Toggle | n: Neu | e: Edit | d: Delete | /: Suche | q: Quit
+j/k: Navigation | Space: Toggle | n: Neu | e: Edit | d: Delete | /: Suche | ?: Hilfe | q: Quit
 ```
+
+### Formular
+```
+Tab/Enter: Weiter | Shift+Tab: Zurück | Enter: Speichern | Esc: Abbrechen
+```
+
+### Hilfe-Seite
+Drücke `?` für eine detaillierte Hilfe-Seite mit allen verfügbaren Shortcuts, gruppiert nach Kategorien:
+- Navigation
+- Aktionen
+- Kategorien
+- Projekte
+- Allgemein

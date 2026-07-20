@@ -20,6 +20,7 @@ const (
 	modeEditCategory
 	modeDeleteCategory
 	modeProjectList
+	modeHelp
 )
 
 type App struct {
@@ -30,6 +31,7 @@ type App struct {
 	form           formModel
 	categoryForm   categoryFormModel
 	projectList    projectListModel
+	help           helpModel
 	currentProject string
 	mode           mode
 	quitting       bool
@@ -94,6 +96,12 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if a.mode == modeList {
 				a.projectList = newProjectListModel(a.projectManager)
 				a.mode = modeProjectList
+				return a, nil
+			}
+		case "?":
+			if a.mode == modeList || a.mode == modeProjectList {
+				a.help = newHelpModel()
+				a.mode = modeHelp
 				return a, nil
 			}
 		case "n":
@@ -190,6 +198,16 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, cmd
 	}
 
+	if a.mode == modeHelp {
+		var cmd tea.Cmd
+		a.help, cmd = a.help.Update(msg)
+		if a.help.IsQuitting() {
+			a.mode = modeList
+			return a, nil
+		}
+		return a, cmd
+	}
+
 	var cmd tea.Cmd
 
 	switch a.mode {
@@ -263,6 +281,8 @@ func (a *App) View() string {
 		return TitleStyle.Render("Kategorie bearbeiten") + "\n\n" + a.categoryForm.View()
 	case modeProjectList:
 		return a.projectList.View()
+	case modeHelp:
+		return a.help.View()
 	default:
 		return a.list.View() + a.statusBar()
 	}
@@ -280,7 +300,7 @@ func (a *App) statusBar() string {
 		fmt.Sprintf(" %d/%d erledigt ", completed, len(a.data.Products)),
 	)
 
-	help := HelpStyle.Render("j/k: Navigation | Space: Toggle | n: Neu | e: Edit | d: Delete | K: Kat.Neu | E: Kat.Edit | D: Kat.Delete | Ctrl+O: Öffnen | Ctrl+S: Speichern | /: Suche | q: Quit")
+	help := HelpStyle.Render(GetContextualHelp(a.mode))
 
 	if a.message != "" {
 		return status + "\n\n" + a.message + "\n\n" + help
