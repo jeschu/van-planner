@@ -21,7 +21,7 @@ func (h *HelpView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc", "?":
+		case "esc":
 			return h, nil
 		}
 
@@ -35,7 +35,7 @@ func (h *HelpView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (h *HelpView) View() string {
 	helpText := `
-☀️ Van Planner - Hilfe
+Van Planner - Hilfe
 
 Navigation:
   j / ↓         Nächstes Produkt
@@ -56,5 +56,5 @@ Allgemein:
 }
 
 func (h *HelpView) GetShortcuts() string {
-	return "[Esc/?] Hilfe schließen"
+	return "[Esc] Zurück [?] Hilfe schließen"
 }

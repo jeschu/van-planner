@@ -55,6 +55,10 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				a.state = StateHelp
 				return a, nil
 			}
+			if a.state == StateHelp {
+				a.state = StateProjectView
+				return a, nil
+			}
 		case "esc":
 			if a.state == StateHelp {
 				a.state = StateProjectView
@@ -125,7 +129,7 @@ func (a *App) View() string {
 }
 
 func (a *App) renderHeader() string {
-	header := headerStyle.Render("☀️ Van Planner - Projekt: " + a.projectName)
+	header := headerStyle.Render("Van Planner - Projekt: " + a.projectName)
 
 	return headerBorderStyle.
 		Width(a.width).
