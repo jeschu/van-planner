@@ -78,4 +78,44 @@ var (
 			Bold(true).
 			Foreground(grassGreen).
 			Padding(0, 1)
+
+	editTitleStyle = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(sunYellow).
+			Padding(0, 1)
+
+	focusedLabelStyle = lipgloss.NewStyle().
+				Bold(true).
+				Foreground(sunYellow)
+
+	shortcutStyle = lipgloss.NewStyle().
+			Foreground(warmWhite)
+
+	deleteStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("196"))
+
+	dialogBoxStyle = lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color("196")).
+			Padding(1, 2).
+			Margin(1)
+
+	dialogButtonStyle = lipgloss.NewStyle().
+				Background(lipgloss.Color("196")).
+				Foreground(lipgloss.Color("255")).
+				Bold(true).
+				Padding(0, 2)
+
+	dialogButtonInactiveStyle = lipgloss.NewStyle().
+					Background(lipgloss.Color("245")).
+					Foreground(lipgloss.Color("255")).
+					Bold(true).
+					Padding(0, 2)
+
+	categorySelectStyle = lipgloss.NewStyle().
+				Foreground(skyBlue)
+
+	categorySelectedStyle = lipgloss.NewStyle().
+				Foreground(grassGreen).
+				Bold(true)
 )

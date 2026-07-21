@@ -1,6 +1,8 @@
 package controller
 
 import (
+	tea "github.com/charmbracelet/bubbletea"
+
 	"github.com/jens/van-planner/internal/model"
 	"github.com/jens/van-planner/internal/storage"
 	"github.com/jens/van-planner/internal/ui"
@@ -73,6 +75,14 @@ func (c *Controller) CreateApp() *ui.App {
 	projectView := ui.NewProjectView(c.currentProject)
 	app := ui.NewApp(c.projectName, projectView)
 	c.app = app
+
+	app.SetSaveProjectCmd(func() tea.Cmd {
+		return func() tea.Msg {
+			c.SaveCurrentState()
+			return nil
+		}
+	})
+
 	return app
 }
 

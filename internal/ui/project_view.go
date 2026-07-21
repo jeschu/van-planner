@@ -113,6 +113,11 @@ func (p *ProjectView) renderCategory(category string, products []model.Product) 
 			cursor = cursorStyle.Render("> ")
 		}
 
+		name := product.Name
+		if product.Count != nil && *product.Count > 0 {
+			name = fmt.Sprintf("%dx %s", *product.Count, name)
+		}
+
 		link := product.ShopLink
 		if len(link) > 50 {
 			link = link[:47] + "..."
@@ -120,7 +125,7 @@ func (p *ProjectView) renderCategory(category string, products []model.Product) 
 
 		line := fmt.Sprintf("%s%-40s %12s %14s %-50s",
 			cursor,
-			product.Name,
+			name,
 			fmt.Sprintf("%.2f €", product.EstimatedCost),
 			fmt.Sprintf("%.2f €", product.ActualCost),
 			linkStyle.Render(link))
@@ -189,7 +194,7 @@ func (p *ProjectView) getProductStartIndex(category string) int {
 }
 
 func (p *ProjectView) GetShortcuts() string {
-	return "[↑][↓][←][→]Scroll [Space]Erledigt [q]Quit"
+	return "[↑][↓][←][→]Scroll [Space]Erledigt [e]Edit [n]Neu [q]Quit"
 }
 
 func (p *ProjectView) scrollViewport() {
