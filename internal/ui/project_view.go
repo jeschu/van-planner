@@ -89,6 +89,8 @@ func (p *ProjectView) renderContent() string {
 		sb.WriteString(p.renderCategory(category, products))
 	}
 
+	sb.WriteString(p.renderTotalSum())
+
 	return sb.String()
 }
 
@@ -98,22 +100,78 @@ func (p *ProjectView) renderCategory(category string, products []model.Product) 
 	sb.WriteString(categoryStyle.Render(category))
 	sb.WriteString("\n")
 
+	sb.WriteString(p.renderTableHeader())
+
+	categorySumEstimated := 0.0
+	categorySumActual := 0.0
+
 	for i, product := range products {
 		cursor := "  "
 		if i+p.getProductStartIndex(category) == p.cursorIndex {
 			cursor = cursorStyle.Render("> ")
 		}
 
-		checkbox := "[ ]"
-		if product.Completed {
-			checkbox = checkboxDoneStyle.Render("[✓]")
-		} else {
-			checkbox = checkboxStyle.Render(checkbox)
+		estimatedCost := fmt.Sprintf("%.2f €", product.EstimatedCost)
+		actualCost := fmt.Sprintf("%.2f €", product.ActualCost)
+		link := product.ShopLink
+		if len(link) > 40 {
+			link = link[:37] + "..."
 		}
 
-		line := fmt.Sprintf("%s%s %s", cursor, checkbox, product.Name)
+		line := fmt.Sprintf("%s%-40s %12s %12s %s",
+			cursor,
+			product.Name,
+			estimatedCost,
+			actualCost,
+			linkStyle.Render(link))
 		sb.WriteString(line + "\n")
+
+		categorySumEstimated += product.EstimatedCost
+		categorySumActual += product.ActualCost
 	}
+
+	sb.WriteString(p.renderSumRow(categorySumEstimated, categorySumActual))
+	sb.WriteString("\n")
+
+	return sb.String()
+}
+
+func (p *ProjectView) renderTableHeader() string {
+	var sb strings.Builder
+	header := fmt.Sprintf("  %-40s %12s %12s %s",
+		tableHeaderStyle.Render("Name"),
+		tableHeaderStyle.Render("Kosten geschätzt"),
+		tableHeaderStyle.Render("Kosten tatsächlich"),
+		tableHeaderStyle.Render("Link"))
+	sb.WriteString(header + "\n")
+	return sb.String()
+}
+
+func (p *ProjectView) renderSumRow(estimated, actual float64) string {
+	return fmt.Sprintf("  %-40s %12s %12s",
+		tableSumStyle.Render("Summe"),
+		tableSumStyle.Render(fmt.Sprintf("%.2f €", estimated)),
+		tableSumStyle.Render(fmt.Sprintf("%.2f €", actual)))
+}
+
+func (p *ProjectView) renderTotalSum() string {
+	var sb strings.Builder
+	sb.WriteString("\n")
+
+	totalEstimated := 0.0
+	totalActual := 0.0
+	for _, product := range p.project.Products {
+		totalEstimated += product.EstimatedCost
+		totalActual += product.ActualCost
+	}
+
+	sb.WriteString(totalSumStyle.Render("Gesamtsumme"))
+	sb.WriteString("\n")
+	sb.WriteString(fmt.Sprintf("  %-40s %12s %12s",
+		"",
+		totalSumStyle.Render(fmt.Sprintf("%.2f €", totalEstimated)),
+		totalSumStyle.Render(fmt.Sprintf("%.2f €", totalActual))))
+	sb.WriteString("\n")
 
 	return sb.String()
 }
@@ -149,9 +207,15 @@ func (p *ProjectView) scrollViewport() {
 
 func (p *ProjectView) getCursorLineNumber() int {
 	line := 0
+	currentCategory := ""
+
 	for i, product := range p.project.Products {
-		if i == 0 || p.project.Products[i-1].Category != product.Category {
-			line++
+		if product.Category != currentCategory {
+			if currentCategory != "" {
+				line++
+			}
+			line += 2
+			currentCategory = product.Category
 		}
 		if i == p.cursorIndex {
 			return line

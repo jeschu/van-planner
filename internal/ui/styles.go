@@ -57,4 +57,25 @@ var (
 			Border(lipgloss.RoundedBorder()).
 			BorderForeground(sunGold).
 			Padding(1, 2)
+
+	tableHeaderStyle = lipgloss.NewStyle().
+				Bold(true).
+				Foreground(sunYellow).
+				Padding(0, 1)
+
+	tableCellStyle = lipgloss.NewStyle().
+			Padding(0, 1)
+
+	tableSumStyle = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(sunOrange).
+			Padding(0, 1)
+
+	linkStyle = lipgloss.NewStyle().
+			Foreground(skyBlue)
+
+	totalSumStyle = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(grassGreen).
+			Padding(0, 1)
 )
