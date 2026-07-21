@@ -53,7 +53,7 @@ van-planner/
 │       ├── list.go          # Listenansicht
 │       ├── form.go          # Formular für Create/Edit
 │       └── styles.go        # Lipgloss Styles
-├── data/
+├── projekte/
 │   └── config.json          # Datenspeicher
 ├── go.mod
 ├── go.sum
