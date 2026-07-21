@@ -75,6 +75,9 @@ func (p *ProjectView) View() string {
 func (p *ProjectView) renderContent() string {
 	var sb strings.Builder
 
+	sb.WriteString(p.renderTableHeader())
+	sb.WriteString("\n")
+
 	categoryProducts := make(map[string][]model.Product)
 	for _, product := range p.project.Products {
 		categoryProducts[product.Category] = append(categoryProducts[product.Category], product)
@@ -97,10 +100,9 @@ func (p *ProjectView) renderContent() string {
 func (p *ProjectView) renderCategory(category string, products []model.Product) string {
 	var sb strings.Builder
 
+	sb.WriteString("\n")
 	sb.WriteString(categoryStyle.Render(category))
 	sb.WriteString("\n")
-
-	sb.WriteString(p.renderTableHeader())
 
 	categorySumEstimated := 0.0
 	categorySumActual := 0.0
@@ -111,18 +113,16 @@ func (p *ProjectView) renderCategory(category string, products []model.Product) 
 			cursor = cursorStyle.Render("> ")
 		}
 
-		estimatedCost := fmt.Sprintf("%.2f €", product.EstimatedCost)
-		actualCost := fmt.Sprintf("%.2f €", product.ActualCost)
 		link := product.ShopLink
-		if len(link) > 40 {
-			link = link[:37] + "..."
+		if len(link) > 50 {
+			link = link[:47] + "..."
 		}
 
-		line := fmt.Sprintf("%s%-40s %12s %12s %s",
+		line := fmt.Sprintf("%s%-40s %12s %14s %-50s",
 			cursor,
 			product.Name,
-			estimatedCost,
-			actualCost,
+			fmt.Sprintf("%.2f €", product.EstimatedCost),
+			fmt.Sprintf("%.2f €", product.ActualCost),
 			linkStyle.Render(link))
 		sb.WriteString(line + "\n")
 
@@ -131,32 +131,32 @@ func (p *ProjectView) renderCategory(category string, products []model.Product) 
 	}
 
 	sb.WriteString(p.renderSumRow(categorySumEstimated, categorySumActual))
-	sb.WriteString("\n")
 
 	return sb.String()
 }
 
 func (p *ProjectView) renderTableHeader() string {
 	var sb strings.Builder
-	header := fmt.Sprintf("  %-40s %12s %12s %s",
+	header := fmt.Sprintf("  %-40s %12s %14s %-50s",
 		tableHeaderStyle.Render("Name"),
 		tableHeaderStyle.Render("Kosten geschätzt"),
 		tableHeaderStyle.Render("Kosten tatsächlich"),
 		tableHeaderStyle.Render("Link"))
-	sb.WriteString(header + "\n")
+	sb.WriteString(header)
 	return sb.String()
 }
 
 func (p *ProjectView) renderSumRow(estimated, actual float64) string {
-	return fmt.Sprintf("  %-40s %12s %12s",
+	return fmt.Sprintf("  %-40s %12s %14s %-50s",
 		tableSumStyle.Render("Summe"),
 		tableSumStyle.Render(fmt.Sprintf("%.2f €", estimated)),
-		tableSumStyle.Render(fmt.Sprintf("%.2f €", actual)))
+		tableSumStyle.Render(fmt.Sprintf("%.2f €", actual)),
+		"")
 }
 
 func (p *ProjectView) renderTotalSum() string {
 	var sb strings.Builder
-	sb.WriteString("\n")
+	sb.WriteString("\n\n")
 
 	totalEstimated := 0.0
 	totalActual := 0.0
@@ -167,10 +167,11 @@ func (p *ProjectView) renderTotalSum() string {
 
 	sb.WriteString(totalSumStyle.Render("Gesamtsumme"))
 	sb.WriteString("\n")
-	sb.WriteString(fmt.Sprintf("  %-40s %12s %12s",
+	sb.WriteString(fmt.Sprintf("  %-40s %12s %14s %-50s",
 		"",
 		totalSumStyle.Render(fmt.Sprintf("%.2f €", totalEstimated)),
-		totalSumStyle.Render(fmt.Sprintf("%.2f €", totalActual))))
+		totalSumStyle.Render(fmt.Sprintf("%.2f €", totalActual)),
+		""))
 	sb.WriteString("\n")
 
 	return sb.String()
@@ -194,8 +195,8 @@ func (p *ProjectView) GetShortcuts() string {
 func (p *ProjectView) scrollViewport() {
 	targetLine := p.getCursorLineNumber()
 
-	if targetLine < p.viewport.YOffset {
-		if targetLine > 0 {
+	if targetLine < p.viewport.YOffset+2 {
+		if targetLine > 2 {
 			p.viewport.YOffset = targetLine - 1
 		} else {
 			p.viewport.YOffset = 0
@@ -206,7 +207,7 @@ func (p *ProjectView) scrollViewport() {
 }
 
 func (p *ProjectView) getCursorLineNumber() int {
-	line := 0
+	line := 2
 	currentCategory := ""
 
 	for i, product := range p.project.Products {
