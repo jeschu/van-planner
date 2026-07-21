@@ -4,7 +4,7 @@
 ✅ Implementiert
 
 ## Beschreibung
-Zentrales TUI-Layout mit Header, scrollbarem Content-Bereich und kontext-sensitivem Footer. Jede View liefert ihre eigene Tastaturnavigation über eine `GetShortcuts()`-Methode.
+Zentrales TUI-Layout mit Header, scrollbarem Content-Bereich und kontext-sensitivem Footer. Produktliste wird kategorisiert ohne Detailansicht angezeigt. Jede View liefert ihre eigene Tastaturnavigation über eine `GetShortcuts()`-Methode.
 
 ## Funktionalität
 
@@ -85,14 +85,14 @@ Keine Änderungen am Datenmodell erforderlich.
 │  Van Planner                                │
 │  Projekt: Camper Van                        │
 ├─────────────────────────────────────────────┤
-│  Fahrzeug                                   │
-│  ☐ Reifen                                   │
-│  ☑ Batteriewechsel                          │
-│  ☐ Ölwechsel                                │
 │                                             │
+│  Fahrzeug                                   │
+│  [ ] Reifen                                 │
+│  [✔] Batteriewechsel                         │
+│  [ ] Ölwechsel                               │
 │  Elektrik                                   │
-│  ☐ Solarpanel                               │
-│  ☑ Ladegerät                                │
+│  [ ] Solarpanel                              │
+│  [✔] Ladegerät                               │
 ├─────────────────────────────────────────────┘
 │  [j]↓ [k]↑ [←][→]Kat [n]Neu [e]Edit [q]Quit │
 └─────────────────────────────────────────────┘

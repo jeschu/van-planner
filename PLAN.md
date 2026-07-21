@@ -1,120 +1,212 @@
-# Van Planner - Implementierungsplan
+# Plan: TUI-Überarbeitung
 
-## Übersicht
+## Zusammenfassung
 
-Eine TUI-Anwendung in Go zur Planung von Campervan-Ausbauprodukten mit JSON-Datenhaltung.
+Die TUI soll in 4 Punkten überarbeitet werden:
+1. Checkbox-Rendering von Unicode-Symbolen zu ASCII `[ ]` / `[x]`
+2. Entfernung der Leerzeilen zwischen Kategorien
+3. Entfernung der Detailansicht für ausgewählte Produkte
+4. Hinzufügen einer Leerzeile zwischen Header und Content
 
-## Technische Entscheidungen
+---
 
-| Komponente | Auswahl |
-|------------|---------|
-| TUI-Bibliothek | Bubble Tea (charm.sh) |
-| Datenhaltung | JSON-Datei |
-| CRUD-Operationen | Vollständig (Create, Read, Update, Delete) |
-| Status-Funktion | Checkbox für "erledigt"-Markierung |
-| Produkt-Attribute | Benutzerdefiniert erweiterbar |
+## Phase 1: Feature-Dateien anpassen
 
-## Datenmodell
+### Datei: `features/01-tui.md`
 
-### Produkt-Struktur
+#### Änderung 1: UI-Beispiel aktualisieren
+**Abschnitt:** UI-Beispiel (Zeile 81-99)
 
-```json
-{
-  "id": "uuid",
-  "name": "string",
-  "category": "string",
-  "completed": false,
-  "price": 0.0,
-  "shopLink": "string",
-  "notes": "string",
-  "customFields": {}
+**Alt:**
+```
+☐ Reifen
+☑ Batteriewechsel
+```
+
+**Neu:**
+```
+[ ] Reifen
+[x] Batteriewechsel
+```
+
+#### Änderung 2: Tastatur-Shortcuts prüfen
+**Abschnitt:** Listenansicht (Zeile 51-61)
+
+Keine Änderungen erforderlich, Shortcuts bleiben gleich.
+
+#### Änderung 3: Beschreibung ergänzen
+**Abschnitt:** Beschreibung (Zeile 6-7)
+
+**Neuer Text:**
+```
+Zentrales TUI-Layout mit Header, scrollbarem Content-Bereich und kontext-sensitivem Footer.
+Produktliste wird kategorisiert ohne Detailansicht angezeigt.
+Jede View liefert ihre eigene Tastaturnavigation über eine `GetShortcuts()`-Methode.
+```
+
+---
+
+## Phase 2: Code-Änderungen
+
+### Datei: `internal/ui/project_view.go`
+
+#### Änderung 1: Checkbox-Rendering (Zeile 114-119)
+
+**Ort:** Methode `renderCategory()`
+
+**Alt:**
+```go
+checkbox := "☐"
+if product.Completed {
+    checkbox = "☑"
+}
+
+line := fmt.Sprintf("%s[%s] %d. %s", cursor, checkbox, product.Index, product.Name)
+```
+
+**Neu:**
+```go
+checkbox := "[ ]"
+if product.Completed {
+    checkbox := "[x]"
+}
+
+line := fmt.Sprintf("%s%s %d. %s", cursor, checkbox, product.Index, product.Name)
+```
+
+---
+
+#### Änderung 2: Leerzeile zwischen Kategorien entfernen (Zeile 88-91)
+
+**Ort:** Methode `renderContent()`
+
+**Alt:**
+```go
+for _, category := range p.project.Categories {
+    products, exists := categoryProducts[category]
+    if !exists || len(products) == 0 {
+        continue
+    }
+
+    sb.WriteString(p.renderCategory(category, products))
+    sb.WriteString("\n")
 }
 ```
 
-### JSON-Datei-Struktur
+**Neu:**
+```go
+for _, category := range p.project.Categories {
+    products, exists := categoryProducts[category]
+    if !exists || len(products) == 0 {
+        continue
+    }
 
-```json
-{
-  "categories": ["Fahrzeug", "Elektrik", "Wasser", "Küche", "Schlafen", "Stauraum"],
-  "products": [...]
+    sb.WriteString(p.renderCategory(category, products))
 }
 ```
 
-## Architektur
+---
 
-### Verzeichnisstruktur
+#### Änderung 3: Detailansicht entfernen (Zeile 93-96)
 
-```
-van-planner/
-├── cmd/
-│   └── van-planner/
-│       └── main.go
-├── internal/
-│   ├── model/
-│   │   └── product.go
-│   ├── storage/
-│   │   └── json.go
-│   └── ui/
-│       ├── app.go
-│       ├── list.go
-│       ├── form.go
-│       └── styles.go
-├── projekte/
-│   └── config.json
-├── go.mod
-└── go.sum
+**Ort:** Methode `renderContent()`
+
+**Alt:**
+```go
+if len(p.project.Products) > 0 {
+    sb.WriteString(p.renderDetailSection())
+}
+
+return sb.String()
 ```
 
-## UI-Komponenten
+**Neu:**
+```go
+return sb.String()
+```
 
-### Hauptansicht (Liste)
-- Kategorien als vertikale Liste
-- Produkte pro Kategorie mit Checkbox
-- Tastatur-Shortcuts: `j/k` (Navigation), `Space` (Toggle), `n` (Neu), `e` (Edit), `d` (Delete), `q` (Quit)
+**Zusätzlich:** Methode `renderDetailSection()` (Zeile 143-178) kann entfernt werden, da sie nicht mehr verwendet wird.
 
-### Formular (Create/Edit)
-- Eingabefelder für Produkt-Attribute
-- Kategorie-Auswahl
-- Speichern/Abbrechen
+**Zusätzlich:** Methode `statusText()` (Zeile 180-185) kann entfernt werden, da sie nur von `renderDetailSection()` verwendet wurde.
 
-### Status-Leiste
-- Aktuelle Kategorie
-- Fortschrittsanzeige (erledigt/gesamt)
-- Menü-Hints
+---
 
-## Implementierungsstatus
+#### Änderung 4: Leerzeile zwischen Header und Content (Zeile 71-73)
 
-### ✅ Abgeschlossene Features
+**Ort:** Methode `View()`
 
-| Feature | Status | Beschreibung |
-|---------|--------|--------------|
-| Produktverwaltung (CRUD) | ✅ Implementiert | Create, Read, Update, Delete mit Formular |
-| Kategorien | ✅ Implementiert | 6 Standard-Kategorien mit Tabs und Filterung |
-| Kategorien bearbeiten | ✅ Implementiert | Kategorien erstellen, bearbeiten, löschen |
-| Fortschrittsanzeige | ✅ Implementiert | X/Y erledigt mit Checkbox-Toggle |
-| Suche | ✅ Implementiert | Volltextsuche über Name, Notizen, Kategorie |
-| JSON-Persistenz | ✅ Implementiert | Save-on-Change, Load-on-Start |
-| Tastaturbedienung | ✅ Implementiert | Vollständige Keyboard-Navigation |
-| Projekte | ✅ Implementiert | Projekte laden, speichern, wechseln |
+**Alt:**
+```go
+func (p *ProjectView) View() string {
+    return p.viewport.View()
+}
+```
 
-### 🔲 Geplante Features
+**Neu:**
+```go
+func (p *ProjectView) View() string {
+    return "\n" + p.viewport.View()
+}
+```
 
-| Feature | Status | Beschreibung |
-|---------|--------|--------------|
-| Benutzerdefinierte Felder | 🔲 Geplant | Erweitern des Datenmodells um Custom Fields |
-| Export/Import | 🔲 Geplant | CSV/JSON Export und Import |
-| Vorschau/Statistiken | 🔲 Geplant | Übersicht über Budget und Fortschritt |
+---
+
+## Phase 3: Testen
+
+### Manuelle Tests
+
+1. **Checkbox-Rendering**
+   - [ ] Nicht gecheckte Items zeigen `[ ]`
+   - [ ] Gecheckte Items zeigen `[x]`
+   - [ ] Space-Taste toggelt Checkbox korrekt
+
+2. **Kategorie-Abstände**
+   - [ ] Keine Leerzeilen zwischen Kategorien
+   - [ ] Kategorien folgen direkt aufeinander
+
+3. **Detailansicht**
+   - [ ] Keine Detailansicht unter der Produktliste
+   - [ ] Mehr Platz für Produktliste verfügbar
+
+4. **Header-Abstand**
+   - [ ] Eine Leerzeile zwischen Header und Content
+   - [ ] Layout insgesamt korrekt
+
+### Build-Test
+```bash
+go build -o van-planner .
+./van-planner
+```
+
+---
+
+## Dateien-Übersicht
+
+| Datei | Änderungen |
+|-------|------------|
+| `features/01-tui.md` | UI-Beispiel, Beschreibung |
+| `internal/ui/project_view.go` | `renderCategory()`, `renderContent()`, `View()`, Methoden entfernen |
+
+---
 
 ## Abhängigkeiten
 
-```bash
-go get github.com/charmbracelet/bubbletea
-go get github.com/charmbracelet/bubbles
-go get github.com/charmbracelet/lipgloss
-```
+- Keine neuen Dependencies
+- Bestehende Libraries: bubbletea, lipgloss, bubbles
 
-## Nächste Schritte
+---
 
-1. Feature: Benutzerdefinierte Felder – Feature-Datei erstellen und implementieren
-2. Feature: Export/Import – Feature-Datei erstellen und implementieren
-3. Feature: Vorschau/Statistiken – Feature-Datei erstellen und implementieren
+## Risiken
+
+- **Niedrig**: Alle Änderungen sind kosmetisch
+- Keine Änderungen am Datenmodell
+- Keine Änderungen an der Geschäftslogik
+
+---
+
+## Geschätzter Aufwand
+
+- Feature-Dateien: 5 Minuten
+- Code-Änderungen: 15 Minuten
+- Testing: 10 Minuten
+- **Gesamt: ~30 Minuten**
