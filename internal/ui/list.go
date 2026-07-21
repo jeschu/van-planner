@@ -19,6 +19,7 @@ type listModel struct {
 	showSearch    bool
 	categoryWidth int
 	projectName   string
+	contentHeight int
 }
 
 func newListModel(data model.Data, projectName string) listModel {
@@ -28,6 +29,7 @@ func newListModel(data model.Data, projectName string) listModel {
 	l.Title = ""
 	l.SetShowStatusBar(false)
 	l.SetShowHelp(false)
+	l.SetFilteringEnabled(false)
 
 	searchInput := textinput.New()
 	searchInput.Placeholder = "Suche..."
@@ -226,13 +228,12 @@ func (m listModel) View() string {
 		b.WriteString("Keine Produkte. Drücke 'n' um ein neues Produkt zu erstellen.\n\n")
 	}
 
-	b.WriteString(renderTable(m))
-	b.WriteString("\n")
+	b.WriteString(renderTable(m, m.list.Height()))
 
-	return b.String() + m.list.View()
+	return b.String()
 }
 
-func renderTable(m listModel) string {
+func renderTable(m listModel, height int) string {
 	var b strings.Builder
 
 	items := m.list.Items()
@@ -240,53 +241,61 @@ func renderTable(m listModel) string {
 		return ""
 	}
 
-	nameWidth := 50
-	estimatedWidth := 15
-	actualWidth := 15
-	linkWidth := 40
-
-	for _, item := range items {
-		if gi, ok := item.(groupedListItem); ok {
-			if !gi.isHeader && !gi.isSum {
-				if len(gi.product.Name) > nameWidth {
-					nameWidth = len(gi.product.Name)
-				}
-				estimatedStr := fmt.Sprintf("%.2f €", gi.product.EstimatedCost)
-				if len(estimatedStr) > estimatedWidth {
-					estimatedWidth = len(estimatedStr)
-				}
-				actualStr := fmt.Sprintf("%.2f €", gi.product.ActualCost)
-				if len(actualStr) > actualWidth {
-					actualWidth = len(actualStr)
-				}
-				if len(gi.product.ShopLink) > linkWidth {
-					linkWidth = len(gi.product.ShopLink)
-				}
-			}
-		}
+	tableWidth := m.list.Width()
+	if tableWidth < 60 {
+		tableWidth = 60
 	}
 
-	if nameWidth > 60 {
-		nameWidth = 60
+	linkWidth := tableWidth / 3
+	if linkWidth > 40 {
+		linkWidth = 40
 	}
-	if linkWidth > 50 {
-		linkWidth = 50
+	if linkWidth < 20 {
+		linkWidth = 20
+	}
+
+	remainingWidth := tableWidth - linkWidth - 10
+	nameWidth := remainingWidth / 2
+	estimatedWidth := remainingWidth / 4
+	actualWidth := remainingWidth / 4
+
+	if nameWidth < 20 {
+		nameWidth = 20
+	}
+	if estimatedWidth < 10 {
+		estimatedWidth = 10
+	}
+	if actualWidth < 10 {
+		actualWidth = 10
 	}
 
 	b.WriteString(renderHeader(nameWidth, estimatedWidth, actualWidth, linkWidth))
 
+	selectedIndex := m.list.Index()
+	itemIndex := 0
+	contentItems := []string{}
+
 	for _, item := range items {
 		if gi, ok := item.(groupedListItem); ok {
 			if gi.isHeader {
-				b.WriteString(renderCategoryHeader(gi.category, nameWidth, estimatedWidth, actualWidth, linkWidth))
+				contentItems = append(contentItems, renderCategoryHeader(gi.category, nameWidth, estimatedWidth, actualWidth, linkWidth))
 			} else if gi.isSum && gi.totalSum > 0 {
-				b.WriteString(renderTotalSum(gi.totalSum, gi.totalActualSum, nameWidth, estimatedWidth, actualWidth, linkWidth))
+				contentItems = append(contentItems, renderTotalSum(gi.totalSum, gi.totalActualSum, nameWidth, estimatedWidth, actualWidth, linkWidth))
 			} else if gi.isSum {
-				b.WriteString(renderCategorySum(gi.categorySum, gi.categoryActualSum, nameWidth, estimatedWidth, actualWidth, linkWidth))
+				contentItems = append(contentItems, renderCategorySum(gi.categorySum, gi.categoryActualSum, nameWidth, estimatedWidth, actualWidth, linkWidth))
 			} else {
-				b.WriteString(renderProductRow(gi.product, nameWidth, estimatedWidth, actualWidth, linkWidth))
+				if itemIndex == selectedIndex {
+					contentItems = append(contentItems, renderProductRowSelected(gi.product, nameWidth, estimatedWidth, actualWidth, linkWidth))
+				} else {
+					contentItems = append(contentItems, renderProductRow(gi.product, nameWidth, estimatedWidth, actualWidth, linkWidth))
+				}
+				itemIndex++
 			}
 		}
+	}
+
+	for i := 0; i < len(contentItems); i++ {
+		b.WriteString(contentItems[i])
 	}
 
 	return b.String()
@@ -308,11 +317,6 @@ func renderCategoryHeader(category string, nameWidth, estimatedWidth, actualWidt
 }
 
 func renderProductRow(p model.Product, nameWidth, estimatedWidth, actualWidth, linkWidth int) string {
-	completed := "  "
-	if p.Completed {
-		completed = "✓ "
-	}
-
 	name := p.Name
 	if len(name) > nameWidth {
 		name = name[:nameWidth-3] + "..."
@@ -326,7 +330,24 @@ func renderProductRow(p model.Product, nameWidth, estimatedWidth, actualWidth, l
 		link = link[:linkWidth-3] + "..."
 	}
 
-	return fmt.Sprintf("%s%-*s %s %s %s\n", completed, nameWidth, name, estimated, actual, link)
+	return fmt.Sprintf("  %-*s %s %s %s\n", nameWidth, name, estimated, actual, link)
+}
+
+func renderProductRowSelected(p model.Product, nameWidth, estimatedWidth, actualWidth, linkWidth int) string {
+	name := p.Name
+	if len(name) > nameWidth {
+		name = name[:nameWidth-3] + "..."
+	}
+
+	estimated := fmt.Sprintf("%*.2f €", estimatedWidth, p.EstimatedCost)
+	actual := fmt.Sprintf("%*.2f €", actualWidth, p.ActualCost)
+
+	link := p.ShopLink
+	if len(link) > linkWidth {
+		link = link[:linkWidth-3] + "..."
+	}
+
+	return SelectedItemStyle.Render(fmt.Sprintf("▶ %-*s %s %s %s\n", nameWidth, name, estimated, actual, link))
 }
 
 func renderCategorySum(catSum, catActualSum float64, nameWidth, estimatedWidth, actualWidth, linkWidth int) string {
@@ -346,7 +367,13 @@ func renderTotalSum(totalSum, totalActualSum float64, nameWidth, estimatedWidth,
 }
 
 func (m listModel) SetSize(width, height int) {
-	m.list.SetSize(width, height-12)
+	headerHeight := 4
+	footerHeight := 4
+	contentHeight := height - headerHeight - footerHeight
+	if contentHeight < 1 {
+		contentHeight = 1
+	}
+	m.list.SetSize(width, contentHeight)
 	m.searchInput.Width = width - 4
 }
 

@@ -133,7 +133,7 @@
     {
       "id": "12",
       "name": "Dieselheizung",
-      "category": "Heizung",
+      "category": "Heizun",
       "completed": false,
       "estimatedCost": 0,
       "actualCost": 0,
@@ -307,5 +307,5 @@
       "customFields": {}
     }
   ],
-  "lastProductId": "1"
+  "lastProductId": "18"
 }

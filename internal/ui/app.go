@@ -268,6 +268,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, cmd
 
 	default:
+		var cmd tea.Cmd
 		a.list, cmd = a.list.Update(msg)
 		a.data = a.list.GetData()
 		if err := a.storage.Save(a.data); err != nil {
@@ -297,7 +298,7 @@ func (a *App) View() string {
 	case modeHelp:
 		return a.help.View()
 	default:
-		return a.list.View() + a.statusBar()
+		return a.list.View() + "\n" + a.statusBar()
 	}
 }
 
