@@ -1,5 +1,5 @@
 {
-  "categories": [
+  "defaultCategories": [
     "Fahrzeug",
     "Werkzeug",
     "Dämmung",
@@ -8,5 +8,8 @@
     "Fenster",
     "Elektrik"
   ],
-  "products": []
+  "projects": [
+    "Camper Van"
+  ],
+  "lastProject": 0
 }

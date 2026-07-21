@@ -10,7 +10,7 @@
   ],
   "products": [
     {
-      "id": "1",
+      "index": 1,
       "name": "Ducato",
       "category": "Fahrzeug",
       "completed": false,
@@ -21,7 +21,7 @@
       "customFields": {}
     },
     {
-      "id": "2",
+      "index": 2,
       "name": "Blindnietzange",
       "category": "Werkzeug",
       "completed": false,
@@ -32,7 +32,7 @@
       "customFields": {}
     },
     {
-      "id": "3",
+      "index": 3,
       "name": "Akku-Schrauber/Bohrer",
       "category": "Werkzeug",
       "completed": false,
@@ -43,7 +43,7 @@
       "customFields": {}
     },
     {
-      "id": "4",
+      "index": 4,
       "name": "Akku Starter Kit",
       "category": "Werkzeug",
       "completed": false,
@@ -54,7 +54,7 @@
       "customFields": {}
     },
     {
-      "id": "5",
+      "index": 5,
       "name": "Crimpzange",
       "category": "Werkzeug",
       "completed": false,
@@ -65,7 +65,7 @@
       "customFields": {}
     },
     {
-      "id": "6",
+      "index": 6,
       "name": "Stufenbohrer",
       "category": "Werkzeug",
       "completed": false,
@@ -76,7 +76,7 @@
       "customFields": {}
     },
     {
-      "id": "7",
+      "index": 7,
       "name": "2 Keramikmesser",
       "category": "Werkzeug",
       "completed": false,
@@ -87,7 +87,7 @@
       "customFields": {}
     },
     {
-      "id": "8",
+      "index": 8,
       "name": "6x 600ml Bremsenreiniger",
       "category": "Werkzeug",
       "completed": false,
@@ -98,7 +98,7 @@
       "customFields": {}
     },
     {
-      "id": "9",
+      "index": 9,
       "name": "4x 6m² K-Flex ST selbstklebend 19mm",
       "category": "Dämmung",
       "completed": false,
@@ -109,7 +109,7 @@
       "customFields": {}
     },
     {
-      "id": "10",
+      "index": 10,
       "name": "4x 15m K-Flex ST Tapeband 3mm (Breite 5mm)",
       "category": "Dämmung",
       "completed": false,
@@ -120,7 +120,7 @@
       "customFields": {}
     },
     {
-      "id": "11",
+      "index": 11,
       "name": "Versandkosten",
       "category": "Dämmung",
       "completed": false,
@@ -131,7 +131,7 @@
       "customFields": {}
     },
     {
-      "id": "12",
+      "index": 12,
       "name": "Dieselheizung",
       "category": "Heizun",
       "completed": false,
@@ -142,7 +142,7 @@
       "customFields": {}
     },
     {
-      "id": "13",
+      "index": 13,
       "name": "combiBOIL Warmwasserboiler 7l 12V 300W",
       "category": "Heizung",
       "completed": false,
@@ -153,7 +153,7 @@
       "customFields": {}
     },
     {
-      "id": "14",
+      "index": 14,
       "name": "Warmduscher Kit 2.0 (4kW, 9L)",
       "category": "Heizung",
       "completed": false,
@@ -164,7 +164,7 @@
       "customFields": {}
     },
     {
-      "id": "15",
+      "index": 15,
       "name": "Frischwassertank (100l)",
       "category": "Wasser",
       "completed": false,
@@ -175,7 +175,7 @@
       "customFields": {}
     },
     {
-      "id": "16",
+      "index": 16,
       "name": "Grauwassertank",
       "category": "Wasser",
       "completed": false,
@@ -186,7 +186,7 @@
       "customFields": {}
     },
     {
-      "id": "17",
+      "index": 17,
       "name": "Maxxair SKYMAXX LX Dachfenster, 500x700mm, Dachstärke 23-43mm",
       "category": "Fenster",
       "completed": false,
@@ -197,7 +197,7 @@
       "customFields": {}
     },
     {
-      "id": "18",
+      "index": 18,
       "name": "Maxxfan Deluxe",
       "category": "Fenster",
       "completed": false,
@@ -208,7 +208,7 @@
       "customFields": {}
     },
     {
-      "id": "19",
+      "index": 19,
       "name": "Hecktüre links",
       "category": "Fenster",
       "completed": false,
@@ -219,7 +219,7 @@
       "customFields": {}
     },
     {
-      "id": "20",
+      "index": 20,
       "name": "Hecktüre rechts",
       "category": "Fenster",
       "completed": false,
@@ -230,7 +230,7 @@
       "customFields": {}
     },
     {
-      "id": "21",
+      "index": 21,
       "name": "2x 310ml Dekaseal 8936",
       "category": "Fenster",
       "completed": false,
@@ -241,7 +241,7 @@
       "customFields": {}
     },
     {
-      "id": "22",
+      "index": 22,
       "name": "LiFePO4 Bausatz 4 kWh 12 V / 12,8 V mit EVE LF280K V3 A+",
       "category": "Elektrik",
       "completed": false,
@@ -252,7 +252,7 @@
       "customFields": {}
     },
     {
-      "id": "23",
+      "index": 23,
       "name": "2x ECTIVE BSP 190 Black Monokristallin Solarmodul 190W",
       "category": "Elektrik",
       "completed": false,
@@ -263,7 +263,7 @@
       "customFields": {}
     },
     {
-      "id": "24",
+      "index": 24,
       "name": "Solar Connect 4m 6mm Dachdurchführung mit Kabel MC4 rot/schwarz",
       "category": "Elektrik",
       "completed": false,
@@ -274,7 +274,7 @@
       "customFields": {}
     },
     {
-      "id": "25",
+      "index": 25,
       "name": "ECTIVE SI 20 2000W/12V Sinus-Wechselrichter mit reiner Sinuswelle",
       "category": "Elektrik",
       "completed": false,
@@ -285,7 +285,7 @@
       "customFields": {}
     },
     {
-      "id": "26",
+      "index": 26,
       "name": "ECTIVE BB 60 Ladebooster 60A",
       "category": "Elektrik",
       "completed": false,
@@ -296,7 +296,7 @@
       "customFields": {}
     },
     {
-      "id": "27",
+      "index": 27,
       "name": "ECTIVE SC 40 MPPT Solar-Laderegler für 12/24V Versorgungsbatterie",
       "category": "Elektrik",
       "completed": false,
@@ -306,6 +306,5 @@
       "notes": "",
       "customFields": {}
     }
-  ],
-  "lastProductId": "18"
+  ]
 }
