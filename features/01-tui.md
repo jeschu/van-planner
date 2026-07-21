@@ -1,7 +1,7 @@
 # Feature: TUI-Layout
 
 ## Status
-🔲 Geplant / ⬇️ In Arbeit / ✅ Implementiert
+✅ Implementiert
 
 ## Beschreibung
 Zentrales TUI-Layout mit Header, scrollbarem Content-Bereich und kontext-sensitivem Footer. Jede View liefert ihre eigene Tastaturnavigation über eine `GetShortcuts()`-Methode.

@@ -1,7 +1,7 @@
 # Feature: Projekt
 
 ## Status
-🔲 Geplant / ⬇️ In Arbeit / ✅ Implementiert
+✅ Implementiert
 
 ## Beschreibung
 Ein Projekt wird im Ordner `projekte` als JSON-Datei gespeichert. Die Hauptansicht der TUI zeigt die Produkte des Projekts als Tabelle, gruppiert nach Kategorien in der definierten Reihenfolge. Produkte sind nach Index sortiert. Mit den Cursortasten lässt sich ein Produkt auswählen, das im Content-Bereich mit allen Feldern angezeigt wird. Bei breiter Darstellung wird horizontales Scrollen unterstützt.

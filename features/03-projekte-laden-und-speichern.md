@@ -1,7 +1,7 @@
 # Feature: Projekte laden und speichern
 
 ## Status
-🔲 Geplant
+✅ Implementiert
 
 ## Beschreibung
 Ermöglicht das Laden von Projekten über eine Projektliste und automatisches Speichern beim Beenden. Beim Neustart wird das zuletzt verwendete Projekt automatisch geladen.
