@@ -8,53 +8,69 @@ Van Planner ist eine terminal-basierte Anwendung zur Planung von Campervan-Ausba
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      cmd/van-planner                         │
-│                         (main.go)                            │
+│                         main.go                              │
 │                          Entry Point                         │
 └─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
+                               │
+                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                        internal/ui                           │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐    │
-│  │  app.go  │  │ list.go  │  │ form.go  │  │ styles.go│    │
-│  │  (Model) │  │  (View)  │  │ (View)   │  │ (Styles) │    │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘    │
+│                   internal/controller                        │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │                  controller.go                       │   │
+│  │  - Controller                                        │   │
+│  │  - Koordiniert UI, Storage und Business-Logik        │   │
+│  │  - Projekt-Management                                │   │
+│  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
-                              │
-              ┌───────────────┴───────────────┐
-              │                               │
-              ▼                               ▼
+                               │
+               ┌───────────────┴───────────────┐
+               │                               │
+               ▼                               ▼
 ┌──────────────────────────┐    ┌──────────────────────────┐
-│   internal/model         │    │   internal/storage       │
+│   internal/ui            │    │   internal/storage       │
 │  ┌────────────────────┐  │    │  ┌────────────────────┐  │
-│  │   product.go       │  │    │  │   json.go          │  │
-│  │   - Product        │  │    │  │   - JSONStorage    │  │
-│  │   - Data           │  │    │  │   - Load()         │  │
-│  └────────────────────┘  │    │  │   - Save()         │  │
+│  │   app.go           │  │    │  │   config.go        │  │
+│  │   project_view.go  │  │    │  │   - ConfigStorage  │  │
+│  │   project_list.go  │  │    │  │   - Load/Save      │  │
+│  │   help.go          │  │    │  └────────────────────┘  │
+│  └────────────────────┘  │    │  ┌────────────────────┐  │
+│                          │    │  │   project.go       │  │
+│                          │    │  │   - ProjectStorage │  │
+│                          │    │  │   - Load/Save/List │  │
 │                          │    │  └────────────────────┘  │
 └──────────────────────────┘    └──────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   internal/model                             │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │   project.go                                         │   │
+│  │   - Project                                          │   │
+│  │   - Product                                          │   │
+│  └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ## Verzeichnisstruktur
 
 ```
 van-planner/
-├── cmd/
-│   └── van-planner/
-│       └── main.go          # Application Entry Point
+├── main.go                  # Application Entry Point
 ├── internal/
+│   ├── controller/
+│   │   └── controller.go    # Controller: Koordiniert UI & Storage
 │   ├── model/
-│   │   └── product.go       # Datenmodelle (Product, Data)
+│   │   └── project.go       # Datenmodelle (Project, Product)
 │   ├── storage/
-│   │   └── json.go          # JSON-Persistenz
+│   │   ├── config.go        # Config-Persistenz
+│   │   └── project.go       # Projekt-Persistenz
 │   └── ui/
 │       ├── app.go           # Haupt-Model (Bubble Tea)
-│       ├── list.go          # Listenansicht
-│       ├── form.go          # Formular für Create/Edit
-│       └── styles.go        # Lipgloss Styles
+│       ├── project_view.go  # Projekt-Ansicht
+│       ├── project_list.go  # Projekt-Liste
+│       └── help.go          # Hilfe-Ansicht
 ├── projekte/
-│   └── config.json          # Datenspeicher
+│   └── *.json               # Projekt-Daten
 ├── go.mod
 ├── go.sum
 ├── README.md
@@ -94,22 +110,30 @@ Jede Komponente hat eine klare, einzelne Verantwortung:
 
 | Komponente | Verantwortung |
 |------------|---------------|
-| `model/` | Datenstrukturen und Business-Logik |
+| `controller/` | Orchestrierung, Business-Logik, Projekt-Management |
+| `model/` | Datenstrukturen definieren |
 | `storage/` | Datenpersistenz (JSON I/O) |
 | `ui/` | Präsentation und Interaktion |
 
 ### 3. Immutable State Updates
 
-Zustandsänderungen erfolgen durch Erzeugung neuer Modelle:
+Zustandsänderungen erfolgen durch Erzeugung neuer Modelle statt Mutation:
 
 ```go
-func (m listModel) Update(msg tea.Msg) (listModel, tea.Cmd) {
-    // Erzeuge neues Modell statt Mutation
-    newModel := m
-    newModel.data = updatedData
-    return newModel, nil
+func (p *ProjectView) toggleProductCompleted(index int) {
+    newProducts := make([]model.Product, len(p.project.Products))
+    for i, product := range p.project.Products {
+        newProducts[i] = product
+    }
+    newProducts[index].Completed = !newProducts[index].Completed
+    p.project.Products = newProducts
 }
 ```
+
+Vorteile:
+- Vorhersehbarer State-Flow
+- Einfachere Debugging-Möglichkeiten
+- Thread-safe durch keine Seiteneffekte
 
 ### 4. Dependency Injection
 
@@ -123,29 +147,53 @@ func NewApp(storage *storage.JSONStorage) (*App, error) {
 
 ## Komponenten
 
-### Model (`internal/model/product.go`)
+### Controller (`internal/controller/controller.go`)
+
+**Verantwortung**: Orchestrierung und Business-Logik
+
+- Initialisiert Anwendung
+- Koordiniert UI und Storage
+- Projekt-Management (Laden, Speichern, Wechseln)
+- Kapselt Datenzugriff von der UI
+
+```go
+type Controller struct {
+    configStorage  *storage.ConfigStorage
+    projectStorage *storage.ProjectStorage
+    currentProject *model.Project
+    app            *ui.App
+}
+
+func (c *Controller) SwitchProject(projectName string) error
+func (c *Controller) SaveCurrentState() error
+```
+
+### Model (`internal/model/project.go`)
 
 **Verantwortung**: Datenstrukturen definieren
 
 ```go
-type Product struct {
-    ID           string
-    Name         string
-    Category     string
-    Completed    bool
-    Price        float64
-    ShopLink     string
-    Notes        string
-    CustomFields map[string]interface{}
+type Project struct {
+    Categories []string  `json:"categories"`
+    Products   []Product `json:"products"`
 }
 
-type Data struct {
-    Categories []string
-    Products   []Product
+type Product struct {
+    Index         int            `json:"index"`
+    Name          string         `json:"name"`
+    Count         *int           `json:"count"`
+    EstimatedCost float64        `json:"estimatedCost"`
+    ActualCost    float64        `json:"actualCost"`
+    ShippingCost  float64        `json:"shippingCost"`
+    ShopLink      string         `json:"shopLink"`
+    Notes         string         `json:"notes"`
+    Completed     bool           `json:"completed"`
+    Category      string         `json:"category"`
+    CustomFields  map[string]any `json:"customFields"`
 }
 ```
 
-### Storage (`internal/storage/json.go`)
+### Storage (`internal/storage/`)
 
 **Verantwortung**: Datenpersistenz
 
@@ -158,26 +206,26 @@ type Data struct {
 #### `app.go` – Haupt-Model
 
 - Koordiniert alle UI-Komponenten
-- Verwaltet Modi (Liste, Create, Edit)
-- Persistiert Daten nach Änderungen
+- Verwaltet States (ProjectView, ProjectList, Help)
+- Delegiert Messages an aktive Views
 
-#### `list.go` – Listenansicht
+#### `project_view.go` – Projekt-Ansicht
 
-- Zeigt Produkte als Liste
-- Kategorie-Filterung
-- Suchfunktionalität
-- Tastatur-Navigation
+- Zeigt Produkte nach Kategorien gruppiert
+- Toggle Completed-Status (Immutable Updates)
+- Horizontales und vertikales Scrollen
+- Auto-Scroll zum Cursor
 
-#### `form.go` – Formular
+#### `project_list.go` – Projekt-Liste
 
-- Eingabe von Produkt-Attributen
-- Validierung
-- Navigation zwischen Feldern
+- Zeigt verfügbare Projekte
+- Auswahl mit Navigation
+- Viewport-basiertes Rendering
 
-#### `styles.go` – Styling
+#### `help.go` – Hilfe-Ansicht
 
-- Zentrale Definition aller Lipgloss-Styles
-- Konsistentes Farbschema
+- Zeigt Keyboard-Shortcuts
+- Dokumentierte Funktionen
 
 ## Datenfluss
 
@@ -192,6 +240,11 @@ Benutzer-Eingabe (Taste)
         ▼
 ┌───────────────┐
 │  App.Update() │ ──► State-Änderung
+└───────────────┘
+        │
+        ▼
+┌───────────────┐
+│  Controller   │ ──► Business-Logik
 └───────────────┘
         │
         ▼

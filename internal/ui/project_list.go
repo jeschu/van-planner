@@ -43,10 +43,10 @@ func (p *ProjectListView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "enter":
 			if len(p.projects) > 0 {
-				return p, tea.Quit
+				return p, nil
 			}
 		case "esc":
-			return p, tea.Quit
+			return p, nil
 		}
 
 	case tea.WindowSizeMsg:

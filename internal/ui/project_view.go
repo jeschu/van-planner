@@ -46,7 +46,7 @@ func (p *ProjectView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case " ":
 			if len(p.project.Products) > 0 {
-				p.project.Products[p.cursorIndex].Completed = !p.project.Products[p.cursorIndex].Completed
+				p.toggleProductCompleted(p.cursorIndex)
 			}
 		case "left":
 			if p.horizontalOffset > 0 {
@@ -170,4 +170,18 @@ func (p *ProjectView) SetProject(project *model.Project) {
 
 func (p *ProjectView) GetProject() *model.Project {
 	return p.project
+}
+
+func (p *ProjectView) toggleProductCompleted(index int) {
+	if index < 0 || index >= len(p.project.Products) {
+		return
+	}
+
+	newProducts := make([]model.Product, len(p.project.Products))
+	for i, product := range p.project.Products {
+		newProducts[i] = product
+	}
+
+	newProducts[index].Completed = !newProducts[index].Completed
+	p.project.Products = newProducts
 }

@@ -64,6 +64,11 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				a.state = StateProjectView
 				return a, nil
 			}
+		case "enter":
+			if a.state == StateProjectList {
+				a.state = StateProjectView
+				return a, nil
+			}
 		}
 
 	case tea.WindowSizeMsg:
@@ -169,4 +174,12 @@ func (a *App) GetCurrentState() AppState {
 
 func (a *App) GetProjectView() *ProjectView {
 	return a.projectView
+}
+
+func (a *App) GetProjectList() *ProjectListView {
+	return a.projectList
+}
+
+func (a *App) SetProjectList(pl *ProjectListView) {
+	a.projectList = pl
 }
