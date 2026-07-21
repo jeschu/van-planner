@@ -4,7 +4,9 @@
 ✅ Implementiert
 
 ## Beschreibung
-Zentrales TUI-Layout mit Header, scrollbarem Content-Bereich und kontext-sensitivem Footer. Produktliste wird kategorisiert ohne Detailansicht angezeigt. Jede View liefert ihre eigene Tastaturnavigation über eine `GetShortcuts()`-Methode.
+Zentrales TUI-Layout mit Header, scrollbarem Content-Bereich und kontext-sensitivem Footer.
+Produktliste wird kategorisiert ohne Detailansicht angezeigt.
+Jede View liefert ihre eigene Tastaturnavigation über eine `GetShortcuts()`-Methode.
 
 ## Funktionalität
 
@@ -88,11 +90,11 @@ Keine Änderungen am Datenmodell erforderlich.
 │                                             │
 │  Fahrzeug                                   │
 │  [ ] Reifen                                 │
-│  [✔] Batteriewechsel                         │
+│  [x] Batteriewechsel                         │
 │  [ ] Ölwechsel                               │
 │  Elektrik                                   │
 │  [ ] Solarpanel                              │
-│  [✔] Ladegerät                               │
+│  [x] Ladegerät                               │
 ├─────────────────────────────────────────────┘
 │  [j]↓ [k]↑ [←][→]Kat [n]Neu [e]Edit [q]Quit │
 └─────────────────────────────────────────────┘

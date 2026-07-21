@@ -37,12 +37,12 @@ func (p *ProjectView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "j", "down":
-			if p.cursorIndex < len(p.project.Products)-1 {
-				p.cursorIndex++
+			if len(p.project.Products) > 0 {
+				p.cursorIndex = (p.cursorIndex + 1) % len(p.project.Products)
 			}
 		case "k", "up":
-			if p.cursorIndex > 0 {
-				p.cursorIndex--
+			if len(p.project.Products) > 0 {
+				p.cursorIndex = (p.cursorIndex - 1 + len(p.project.Products)) % len(p.project.Products)
 			}
 		case " ":
 			if len(p.project.Products) > 0 {
@@ -64,12 +64,13 @@ func (p *ProjectView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	p.viewport.SetContent(p.renderContent())
+	p.scrollViewport()
 
 	return p, nil
 }
 
 func (p *ProjectView) View() string {
-	return p.viewport.View()
+	return "\n" + p.viewport.View()
 }
 
 func (p *ProjectView) renderContent() string {
@@ -87,11 +88,6 @@ func (p *ProjectView) renderContent() string {
 		}
 
 		sb.WriteString(p.renderCategory(category, products))
-		sb.WriteString("\n")
-	}
-
-	if len(p.project.Products) > 0 {
-		sb.WriteString(p.renderDetailSection())
 	}
 
 	return sb.String()
@@ -113,12 +109,12 @@ func (p *ProjectView) renderCategory(category string, products []model.Product) 
 			cursor = "> "
 		}
 
-		checkbox := "☐"
+		checkbox := "[ ]"
 		if product.Completed {
-			checkbox = "☑"
+			checkbox = "[x]"
 		}
 
-		line := fmt.Sprintf("%s[%s] %d. %s", cursor, checkbox, product.Index, product.Name)
+		line := fmt.Sprintf("%s%s %s", cursor, checkbox, product.Name)
 		sb.WriteString(line + "\n")
 	}
 
@@ -127,65 +123,45 @@ func (p *ProjectView) renderCategory(category string, products []model.Product) 
 
 func (p *ProjectView) getProductStartIndex(category string) int {
 	index := 0
-	for _, cat := range p.project.Categories {
-		if cat == category {
+	for _, product := range p.project.Products {
+		if product.Category == category {
 			return index
 		}
-		for _, product := range p.project.Products {
-			if product.Category == cat {
-				index++
-			}
-		}
+		index++
 	}
 	return index
 }
 
-func (p *ProjectView) renderDetailSection() string {
-	if p.cursorIndex < 0 || p.cursorIndex >= len(p.project.Products) {
-		return ""
-	}
-
-	product := p.project.Products[p.cursorIndex]
-
-	divider := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("241")).
-		Render(strings.Repeat("─", p.width-4))
-
-	detailStyle := lipgloss.NewStyle().Padding(0, 1)
-
-	details := fmt.Sprintf(`%s
-Ausgewähltes Produkt:
-Name: %s
-Kategorie: %s
-Geschätzte Kosten: %.2f €
-Tatsächliche Kosten: %.2f €
-Versandkosten: %.2f €
-Shop-Link: %s
-Notizen: %s
-Status: %s`,
-		divider,
-		product.Name,
-		product.Category,
-		product.EstimatedCost,
-		product.ActualCost,
-		product.ShippingCost,
-		product.ShopLink,
-		product.Notes,
-		p.statusText(product.Completed),
-	)
-
-	return detailStyle.Render(details)
-}
-
-func (p *ProjectView) statusText(completed bool) string {
-	if completed {
-		return "☑ erledigt"
-	}
-	return "☐ offen"
-}
-
 func (p *ProjectView) GetShortcuts() string {
-	return "[↑]↑ [↓]↓ [←][→]Scroll [Space]Erledigt [q]Quit"
+	return "[↑][↓][←][→]Scroll [Space]Erledigt [q]Quit"
+}
+
+func (p *ProjectView) scrollViewport() {
+	targetLine := p.getCursorLineNumber()
+
+	if targetLine < p.viewport.YOffset {
+		if targetLine > 0 {
+			p.viewport.YOffset = targetLine - 1
+		} else {
+			p.viewport.YOffset = 0
+		}
+	} else if targetLine >= p.viewport.YOffset+p.viewport.Height {
+		p.viewport.YOffset = targetLine - p.viewport.Height + 1
+	}
+}
+
+func (p *ProjectView) getCursorLineNumber() int {
+	line := 0
+	for i, product := range p.project.Products {
+		if i == 0 || p.project.Products[i-1].Category != product.Category {
+			line++
+		}
+		if i == p.cursorIndex {
+			return line
+		}
+		line++
+	}
+	return 0
 }
 
 func (p *ProjectView) SetProject(project *model.Project) {

@@ -40,6 +40,8 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "q":
+			return a, tea.Quit
 		case "ctrl+o":
 			if a.state == StateProjectView {
 				a.state = StateProjectList
@@ -114,7 +116,7 @@ func (a *App) View() string {
 	header := a.renderHeader()
 	footer := a.renderFooter()
 
-	return lipgloss.JoinVertical(lipgloss.Top, header, content, footer)
+	return lipgloss.JoinVertical(lipgloss.Top, header, content+"\n", footer)
 }
 
 func (a *App) renderHeader() string {
@@ -122,13 +124,7 @@ func (a *App) renderHeader() string {
 		Bold(true).
 		Padding(0, 1)
 
-	title := headerStyle.Render("Van Planner")
-	project := headerStyle.Render("Projekt: " + a.projectName)
-
-	header := lipgloss.JoinHorizontal(lipgloss.Left, title)
-	if a.width > 40 {
-		header = lipgloss.JoinHorizontal(lipgloss.Center, title, project)
-	}
+	header := headerStyle.Render("Van Planner - Projekt: " + a.projectName)
 
 	return lipgloss.NewStyle().
 		Width(a.width).
