@@ -125,15 +125,10 @@ func (a *App) View() string {
 }
 
 func (a *App) renderHeader() string {
-	headerStyle := lipgloss.NewStyle().
-		Bold(true).
-		Padding(0, 1)
+	header := headerStyle.Render("☀️ Van Planner - Projekt: " + a.projectName)
 
-	header := headerStyle.Render("Van Planner - Projekt: " + a.projectName)
-
-	return lipgloss.NewStyle().
+	return headerBorderStyle.
 		Width(a.width).
-		BorderBottom(true).
 		Render(header)
 }
 
@@ -154,10 +149,6 @@ func (a *App) renderFooter() string {
 			shortcuts = a.helpView.GetShortcuts()
 		}
 	}
-
-	footerStyle := lipgloss.NewStyle().
-		Padding(0, 1).
-		BorderTop(true)
 
 	return footerStyle.
 		Width(a.width).

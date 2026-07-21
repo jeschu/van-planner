@@ -2,7 +2,6 @@ package ui
 
 import (
 	"github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type HelpView struct {
@@ -36,33 +35,24 @@ func (h *HelpView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (h *HelpView) View() string {
 	helpText := `
-Van Planner - Hilfe
+☀️ Van Planner - Hilfe
 
 Navigation:
   j / ↓         Nächstes Produkt
   k / ↑         Vorheriges Produkt
-  ← / →         Kategorie wechseln
+  ← / →         Scrollen
 
 Aktionen:
-  n             Neues Produkt erstellen
-  e             Produkt bearbeiten
-  d             Produkt löschen
   Space         Produkt als erledigt markieren
-  /             Suche öffnen
   Ctrl-O        Projekt laden
   ?             Hilfe anzeigen
 
-Formular:
-  Tab / Enter   Nächstes Feld
-  Shift-Tab     Vorheriges Feld
-  Esc           Abbrechen
+Allgemein:
+  q             Beenden
+  Esc           Zurück
 `
 
-	style := lipgloss.NewStyle().
-		Padding(1, 2).
-		Border(lipgloss.RoundedBorder())
-
-	return style.Render(helpText)
+	return helpBorderStyle.Render(helpText)
 }
 
 func (h *HelpView) GetShortcuts() string {

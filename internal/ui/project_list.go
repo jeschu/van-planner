@@ -69,10 +69,7 @@ func (p *ProjectListView) View() string {
 		return "Lade Projekte..."
 	}
 
-	title := lipgloss.NewStyle().
-		Bold(true).
-		Padding(0, 1).
-		Render("Projekt laden")
+	title := projectTitleStyle.Render("📁 Projekt laden")
 
 	content := p.viewport.View()
 
@@ -85,7 +82,7 @@ func (p *ProjectListView) renderContent() string {
 	for i, project := range p.projects {
 		cursor := "  "
 		if i == p.cursor {
-			cursor = "> "
+			cursor = cursorStyle.Render("> ")
 		}
 		sb.WriteString(fmt.Sprintf("%s%s\n", cursor, project))
 	}

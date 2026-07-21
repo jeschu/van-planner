@@ -6,7 +6,6 @@ import (
 
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 
 	"github.com/jens/van-planner/internal/model"
 )
@@ -96,22 +95,20 @@ func (p *ProjectView) renderContent() string {
 func (p *ProjectView) renderCategory(category string, products []model.Product) string {
 	var sb strings.Builder
 
-	categoryStyle := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color("203"))
-
 	sb.WriteString(categoryStyle.Render(category))
 	sb.WriteString("\n")
 
 	for i, product := range products {
 		cursor := "  "
 		if i+p.getProductStartIndex(category) == p.cursorIndex {
-			cursor = "> "
+			cursor = cursorStyle.Render("> ")
 		}
 
 		checkbox := "[ ]"
 		if product.Completed {
-			checkbox = "[x]"
+			checkbox = checkboxDoneStyle.Render("[✓]")
+		} else {
+			checkbox = checkboxStyle.Render(checkbox)
 		}
 
 		line := fmt.Sprintf("%s%s %s", cursor, checkbox, product.Name)
